@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Administración - Lunamar</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #fffbe7; }
+    label { display: block; margin-top: 10px; }
+    input, textarea { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 20px; padding: 10px 20px; background: #6a4e77; color: white; border: none; cursor: pointer; }
+    pre { background: #f5f5f5; padding: 10px; margin-top: 20px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Agregar nuevo producto</h1>
+  <label>Nombre: <input id="nombre" /></label>
+  <label>Precio Mayoreo: <input id="mayoreo" /></label>
+  <label>Precio Menudeo: <input id="menudeo" /></label>
+  <label>Descripción: <textarea id="descripcion"></textarea></label>
+  <label>Imagen URL: <input id="imagen" /></label>
+  <label>Número de WhatsApp (521xxxxxxxxxx): <input id="whatsapp" /></label>
+  <button onclick="generar()">Generar JSON</button>
+  <pre id="salida"></pre>
+
+  <script>
+    function generar() {
+      const producto = {
+        nombre: document.getElementById('nombre').value,
+        precioMayoreo: document.getElementById('mayoreo').value,
+        precioMenudeo: document.getElementById('menudeo').value,
+        descripcion: document.getElementById('descripcion').value,
+        imagen: document.getElementById('imagen').value,
+        whatsapp: document.getElementById('whatsapp').value
+      };
+      document.getElementById('salida').textContent = JSON.stringify(producto, null, 2) + ',';
+    }
+  </script>
+</body>
+</html>
