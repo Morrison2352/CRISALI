@@ -6,12 +6,104 @@
   <title>Lunamar Bags | Catálogo</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
-    /* ...todos tus estilos previos idénticos... */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #fdf6f9;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header, footer {
+      background: #f0d7e7;
+      text-align: center;
+      padding: 20px;
+    }
+    header h1 {
+      margin: 10px 0 0;
+      color: #6a4e77;
+    }
+    .logo {
+      max-width: 180px;
+      margin-bottom: 10px;
+    }
+    .catalogo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .producto {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .producto:hover {
+      transform: translateY(-5px);
+    }
+    .producto img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .producto h3 {
+      color: #6a4e77;
+      margin: 10px 0;
+    }
+    .boton {
+      background: #6a4e77;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 10px;
+      cursor: pointer;
+      text-align: center;
+      width: 100%;
+    }
+    #formularioCliente {
+      padding: 20px;
+      background: #fff3f6;
+      border-top: 2px solid #e0a5c0;
+      margin: 40px auto;
+      max-width: 500px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+    }
+    #formularioCliente h3 {
+      color: #6a4e77;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #formularioCliente input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    @media (max-width: 768px) {
+      .catalogo {
+        padding: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+      #formularioCliente input {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
   <header>
-    <img src="..." alt="Logo" class="logo"/>
+    <img src="https://raw.githubusercontent.com/Morrison2352/lunamar-landing/refs/heads/main/LUNAMAR-BAGS.png" alt="Lunamar Bags Logo" class="logo" />
     <h1>Lunamar Bags</h1>
     <p>Catálogo de productos</p>
   </header>
@@ -21,11 +113,11 @@
   <div id="formularioCliente">
     <h3>Por favor llena tus datos antes de continuar:</h3>
     <input type="text" id="clienteNombre" placeholder="Nombre completo" required />
-    <input type="text" id="clienteDomicilio" placeholder="Domicilio" required/>
-    <input type="text" id="clienteCiudad" placeholder="Ciudad" required/>
-    <input type="text" id="clienteCP" placeholder="Código Postal" required/>
-    <input type="text" id="clienteEstado" placeholder="Estado" required/>
-    <input type="text" id="clientePais" placeholder="País" required/>
+    <input type="text" id="clienteDomicilio" placeholder="Domicilio (calle y número)" required />
+    <input type="text" id="clienteCiudad" placeholder="Ciudad" required />
+    <input type="text" id="clienteCP" placeholder="Código Postal" required />
+    <input type="text" id="clienteEstado" placeholder="Estado" required />
+    <input type="text" id="clientePais" placeholder="País" required />
     <button class="boton" onclick="confirmarDatosCliente()">Enviar y continuar por WhatsApp</button>
   </div>
 
@@ -33,42 +125,48 @@
 
   <script>
     let carrito = {};
-    let productoTemporal = {};
 
-    function toggleCarrito() { /* ... */ }
-    function calcularTotalUnidades() { /* ... */ }
-    function renderCarrito() { /* ... */ }
-    function mostrarModal(nombre, precioMayoreo, precioMenudeo) { /* ... */ }
-    function confirmarCantidad() { /* ... */ }
+    function mostrarModal(nombre, precioMayoreo, precioMenudeo) {
+      const cantidad = 1;
+      if (!carrito[nombre]) {
+        carrito[nombre] = { cantidad, precio: precioMayoreo };
+      } else {
+        carrito[nombre].cantidad += cantidad;
+      }
+      alert(`${nombre} añadido al carrito.`);
+    }
+
     function generarResumenCompra() {
       let resumen = "*Detalle de la compra:*\n";
       let total = 0;
       for (const nombre in carrito) {
         const item = carrito[nombre];
-        const subtotal = item.cantidad * (item.precioMenudeo || item.precioMayoreo);
+        const subtotal = item.cantidad * item.precio;
         total += subtotal;
-        resumen += `- ${nombre}: ${item.cantidad} pzs x $${item.precioMenudeo || item.precioMayoreo} = $${subtotal}\n`;
+        resumen += `- ${nombre}: ${item.cantidad} piezas x $${item.precio} = $${subtotal}\n`;
       }
       resumen += `\nTotal: $${total} MXN\n`;
       return resumen;
     }
 
-    async function confirmarDatosCliente() {
+    function confirmarDatosCliente() {
       const nombre = document.getElementById('clienteNombre').value.trim();
       const domicilio = document.getElementById('clienteDomicilio').value.trim();
       const ciudad = document.getElementById('clienteCiudad').value.trim();
       const cp = document.getElementById('clienteCP').value.trim();
       const estado = document.getElementById('clienteEstado').value.trim();
       const pais = document.getElementById('clientePais').value.trim();
+
       if (!nombre || !domicilio || !ciudad || !cp || !estado || !pais) {
-        return alert('Por favor completa todos los campos.');
+        alert('Por favor completa todos los campos.');
+        return;
       }
+
       const mensaje = `*Datos del cliente:*\nNombre: ${nombre}\nDomicilio: ${domicilio}\nCiudad: ${ciudad}\nCP: ${cp}\nEstado: ${estado}\nPaís: ${pais}\n\n` + generarResumenCompra();
       const numero = '3481098508';
       window.open(`https://wa.me/52${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
     }
 
-    // Carga productos y los muestra en el catálogo
     fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
       .then(res => res.json())
       .then(data => {
@@ -87,9 +185,7 @@
           cont.appendChild(card);
         });
       })
-      .catch(e=> console.error('Error cargando productos:', e));
-
-    // Asegúrate de incluir el resto de funciones: toggleCarrito, renderCarrito, confirmarCantidad...
+      .catch(e => console.error('Error cargando productos:', e));
   </script>
 </body>
 </html>
