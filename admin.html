@@ -16,6 +16,7 @@
     .producto-buttons button { margin-right: 10px; }
     #productosList { margin-top: 20px; }
     #exportJson { white-space: pre-wrap; background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 20px; font-family: monospace; max-height: 300px; overflow-y: auto; }
+    #contadorProductos { font-weight: bold; text-align: right; margin-top: -10px; color: #333; }
     .hidden { display: none; }
   </style>
 </head>
@@ -58,6 +59,7 @@
   </form>
 
   <h2>Productos Actuales</h2>
+  <div id="contadorProductos">Total de productos: 0</div>
   <div id="productosList"></div>
 
   <h2>JSON Exportado</h2>
@@ -65,139 +67,134 @@
 </div>
 
 <script>
-  (function(){
-    const PASSWORD = "lunamar2025";
+(function(){
+  const PASSWORD = "lunamar2025";
 
-    const loginDiv = document.getElementById('login');
-    const adminDiv = document.getElementById('adminPanel');
-    const loginBtn = document.getElementById('loginBtn');
-    const passwordInput = document.getElementById('passwordInput');
-    const loginError = document.getElementById('loginError');
+  const loginDiv = document.getElementById('login');
+  const adminDiv = document.getElementById('adminPanel');
+  const loginBtn = document.getElementById('loginBtn');
+  const passwordInput = document.getElementById('passwordInput');
+  const loginError = document.getElementById('loginError');
 
-    const productosList = document.getElementById('productosList');
-    const exportJson = document.getElementById('exportJson');
-    const productForm = document.getElementById('productForm');
-    const editIndexInput = document.getElementById('editIndex');
-    const cancelEditBtn = document.getElementById('cancelEdit');
+  const productosList = document.getElementById('productosList');
+  const exportJson = document.getElementById('exportJson');
+  const productForm = document.getElementById('productForm');
+  const editIndexInput = document.getElementById('editIndex');
+  const cancelEditBtn = document.getElementById('cancelEdit');
+  const contadorProductos = document.getElementById('contadorProductos');
 
-    let productos = [];
+  let productos = [];
 
-    // Carga inicial de productos (puedes cambiar la URL a la de tu repositorio)
-    const URL_PRODUCTOS_JSON = "https://morrison2352.github.io/lunamar-landing/productos.json";
+  const URL_PRODUCTOS_JSON = "https://morrison2352.github.io/lunamar-landing/productos.json";
 
-    function renderProductos() {
-      productosList.innerHTML = '';
-      productos.forEach((p, i) => {
-        const div = document.createElement('div');
-        div.className = 'producto';
-        div.innerHTML = `
-          <img src="${p.imagen}" alt="${p.nombre}" />
-          <h3>${p.nombre}</h3>
-          <p><strong>Mayoreo:</strong> $${p.precioMayoreo} MXN</p>
-          <p><strong>Menudeo:</strong> $${p.precioMenudeo} MXN</p>
-          <p>${p.descripcion}</p>
-          <p><strong>WhatsApp:</strong> ${p.whatsapp}</p>
-          <div class="producto-buttons">
-            <button data-index="${i}" class="editarBtn">Editar</button>
-            <button data-index="${i}" class="eliminarBtn" style="background:#c0392b;">Eliminar</button>
-          </div>
-        `;
-        productosList.appendChild(div);
+  function renderProductos() {
+    productosList.innerHTML = '';
+    productos.forEach((p, i) => {
+      const div = document.createElement('div');
+      div.className = 'producto';
+      div.innerHTML = `
+        <img src="${p.imagen}" alt="${p.nombre}" />
+        <h3>${p.nombre}</h3>
+        <p><strong>Mayoreo:</strong> $${p.precioMayoreo} MXN</p>
+        <p><strong>Menudeo:</strong> $${p.precioMenudeo} MXN</p>
+        <p>${p.descripcion}</p>
+        <p><strong>WhatsApp:</strong> ${p.whatsapp}</p>
+        <div class="producto-buttons">
+          <button data-index="${i}" class="editarBtn">Editar</button>
+          <button data-index="${i}" class="eliminarBtn" style="background:#c0392b;">Eliminar</button>
+        </div>
+      `;
+      productosList.appendChild(div);
+    });
+    contadorProductos.textContent = `Total de productos: ${productos.length}`;
+    exportarJSON();
+  }
+
+  function exportarJSON() {
+    exportJson.textContent = JSON.stringify(productos, null, 2);
+  }
+
+  function cargarProductos() {
+    fetch(URL_PRODUCTOS_JSON)
+      .then(res => res.json())
+      .then(data => {
+        productos = data;
+        renderProductos();
+      })
+      .catch(() => {
+        productos = [];
+        renderProductos();
       });
-      exportarJSON();
-    }
+  }
 
-    function exportarJSON() {
-      exportJson.textContent = JSON.stringify(productos, null, 2);
+  loginBtn.addEventListener('click', () => {
+    if (passwordInput.value === PASSWORD) {
+      loginDiv.classList.add('hidden');
+      adminDiv.classList.remove('hidden');
+      cargarProductos();
+    } else {
+      loginError.style.display = 'block';
     }
+  });
 
-    // Carga productos desde URL
-    function cargarProductos() {
-      fetch(URL_PRODUCTOS_JSON)
-        .then(res => res.json())
-        .then(data => {
-          productos = data;
-          renderProductos();
-        })
-        .catch(() => {
-          productos = [];
-          renderProductos();
-        });
+  productForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const index = parseInt(editIndexInput.value);
+    const nuevoProducto = {
+      nombre: document.getElementById('nombre').value.trim(),
+      precioMayoreo: parseFloat(document.getElementById('precioMayoreo').value),
+      precioMenudeo: parseFloat(document.getElementById('precioMenudeo').value),
+      descripcion: document.getElementById('descripcion').value.trim(),
+      imagen: document.getElementById('imagen').value.trim(),
+      whatsapp: document.getElementById('whatsapp').value.trim()
+    };
+
+    if (index === -1) {
+      productos.push(nuevoProducto);
+    } else {
+      productos[index] = nuevoProducto;
     }
+    resetForm();
+    renderProductos();
+  });
 
-    // Login
-    loginBtn.addEventListener('click', () => {
-      if (passwordInput.value === PASSWORD) {
-        loginDiv.classList.add('hidden');
-        adminDiv.classList.remove('hidden');
-        cargarProductos();
-      } else {
-        loginError.style.display = 'block';
+  function resetForm() {
+    editIndexInput.value = -1;
+    productForm.reset();
+    cancelEditBtn.classList.add('hidden');
+  }
+
+  cancelEditBtn.addEventListener('click', () => {
+    resetForm();
+  });
+
+  productosList.addEventListener('click', e => {
+    if (e.target.classList.contains('editarBtn')) {
+      const i = parseInt(e.target.dataset.index);
+      cargarFormParaEdicion(i);
+    }
+    if (e.target.classList.contains('eliminarBtn')) {
+      const i = parseInt(e.target.dataset.index);
+      if (confirm(`¿Eliminar producto "${productos[i].nombre}"?`)) {
+        productos.splice(i, 1);
+        renderProductos();
       }
-    });
-
-    // Agregar / Editar Producto
-    productForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const index = parseInt(editIndexInput.value);
-      const nuevoProducto = {
-        nombre: document.getElementById('nombre').value.trim(),
-        precioMayoreo: parseFloat(document.getElementById('precioMayoreo').value),
-        precioMenudeo: parseFloat(document.getElementById('precioMenudeo').value),
-        descripcion: document.getElementById('descripcion').value.trim(),
-        imagen: document.getElementById('imagen').value.trim(),
-        whatsapp: document.getElementById('whatsapp').value.trim()
-      };
-
-      if (index === -1) {
-        productos.push(nuevoProducto);
-      } else {
-        productos[index] = nuevoProducto;
-      }
-      resetForm();
-      renderProductos();
-    });
-
-    // Reset formulario
-    function resetForm() {
-      editIndexInput.value = -1;
-      productForm.reset();
-      cancelEditBtn.classList.add('hidden');
     }
+  });
 
-    // Botón cancelar edición
-    cancelEditBtn.addEventListener('click', () => {
-      resetForm();
-    });
+  function cargarFormParaEdicion(i) {
+    const p = productos[i];
+    editIndexInput.value = i;
+    document.getElementById('nombre').value = p.nombre;
+    document.getElementById('precioMayoreo').value = p.precioMayoreo;
+    document.getElementById('precioMenudeo').value = p.precioMenudeo;
+    document.getElementById('descripcion').value = p.descripcion;
+    document.getElementById('imagen').value = p.imagen;
+    document.getElementById('whatsapp').value = p.whatsapp;
+    cancelEditBtn.classList.remove('hidden');
+  }
 
-    // Delegación para botones Editar y Eliminar
-    productosList.addEventListener('click', e => {
-      if (e.target.classList.contains('editarBtn')) {
-        const i = parseInt(e.target.dataset.index);
-        cargarFormParaEdicion(i);
-      }
-      if (e.target.classList.contains('eliminarBtn')) {
-        const i = parseInt(e.target.dataset.index);
-        if (confirm(`¿Eliminar producto "${productos[i].nombre}"?`)) {
-          productos.splice(i,1);
-          renderProductos();
-        }
-      }
-    });
-
-    function cargarFormParaEdicion(i) {
-      const p = productos[i];
-      editIndexInput.value = i;
-      document.getElementById('nombre').value = p.nombre;
-      document.getElementById('precioMayoreo').value = p.precioMayoreo;
-      document.getElementById('precioMenudeo').value = p.precioMenudeo;
-      document.getElementById('descripcion').value = p.descripcion;
-      document.getElementById('imagen').value = p.imagen;
-      document.getElementById('whatsapp').value = p.whatsapp;
-      cancelEditBtn.classList.remove('hidden');
-    }
-
-  })();
+})();
 </script>
 
 </body>
