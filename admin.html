@@ -51,9 +51,6 @@
     <label>URL Imagen:
       <input type="url" id="imagen" required />
     </label>
-    <label>WhatsApp (ejemplo: 5213481070708):
-      <input type="tel" id="whatsapp" pattern="521[0-9]{10}" placeholder="521xxxxxxxxxx" required />
-    </label>
     <button type="submit">Guardar Producto</button>
     <button type="button" id="cancelEdit" class="hidden" style="background:#999;">Cancelar Edición</button>
   </form>
@@ -100,7 +97,6 @@
         <p><strong>Mayoreo:</strong> $${p.precioMayoreo} MXN</p>
         <p><strong>Menudeo:</strong> $${p.precioMenudeo} MXN</p>
         <p>${p.descripcion}</p>
-        <p><strong>WhatsApp:</strong> ${p.whatsapp}</p>
         <div class="producto-buttons">
           <button data-index="${i}" class="editarBtn">Editar</button>
           <button data-index="${i}" class="eliminarBtn" style="background:#c0392b;">Eliminar</button>
@@ -156,8 +152,7 @@
       precioMayoreo: parseFloat(document.getElementById('precioMayoreo').value),
       precioMenudeo: parseFloat(document.getElementById('precioMenudeo').value),
       descripcion: document.getElementById('descripcion').value.trim(),
-      imagen: document.getElementById('imagen').value.trim(),
-      whatsapp: document.getElementById('whatsapp').value.trim()
+      imagen: document.getElementById('imagen').value.trim()
     };
 
     if (index === -1) {
@@ -201,7 +196,6 @@
     document.getElementById('precioMenudeo').value = p.precioMenudeo;
     document.getElementById('descripcion').value = p.descripcion;
     document.getElementById('imagen').value = p.imagen;
-    document.getElementById('whatsapp').value = p.whatsapp;
     cancelEditBtn.classList.remove('hidden');
   }
 
