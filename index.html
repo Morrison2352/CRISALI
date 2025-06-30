@@ -15,9 +15,13 @@
     .producto img { max-width: 100%; border-radius: 8px; }
     .producto h3 { color: #6a4e77; margin: 10px 0; }
     .boton { background: #6a4e77; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; display: inline-block; margin-top: 10px; cursor: pointer; }
-    #carrito { padding: 20px; background: #fff3f6; border-top: 2px solid #e0a5c0; position: fixed; top: 80px; right: 20px; width: 320px; max-height: 80vh; overflow-y: auto; box-shadow: 0 0 10px rgba(0,0,0,0.2); display: none; z-index: 1000; }
+    #carrito { 
+      padding: 20px; background: #fff3f6; border-top: 2px solid #e0a5c0; 
+      position: fixed; top: 80px; right: 20px; width: 350px; max-height: 80vh; overflow-y: auto; 
+      box-shadow: 0 0 10px rgba(0,0,0,0.2); display: none; z-index: 1000; 
+    }
     #carrito h2 { color: #6a4e77; }
-    #carrito ul { list-style: none; padding: 0; }
+    #carrito ul { list-style: none; padding: 0; margin-bottom: 15px;}
     #carrito li { margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
     #carrito li > div { flex-grow: 1; }
     input[type='number'] { width: 60px; padding: 5px; margin-right: 10px; }
@@ -42,8 +46,33 @@
       z-index: 1500;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
-    #modalCantidad { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 2000; }
-    #modalContenido { background: white; padding: 20px; border-radius: 10px; text-align: center; max-width: 300px; }
+    #modalCantidad, #modalDatosCliente {
+      display: none; 
+      position: fixed; 
+      top: 0; left: 0; width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.6); 
+      justify-content: center; align-items: center; 
+      z-index: 2000;
+    }
+    #modalContenido, #modalDatosContenido {
+      background: white; padding: 20px; border-radius: 10px; 
+      text-align: center; max-width: 350px;
+      box-sizing: border-box;
+    }
+    #modalDatosContenido label {
+      display: block;
+      text-align: left;
+      margin: 10px 0 5px;
+      font-weight: 600;
+      color: #6a4e77;
+    }
+    #modalDatosContenido input {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
@@ -62,9 +91,10 @@
     <h2>Carrito de Compras</h2>
     <ul id="listaCarrito"></ul>
     <p>Total: $<span id="total">0.00</span> MXN</p>
-    <button class="boton" onclick="realizarPedido()">Realizar Pedido por WhatsApp</button>
+    <button class="boton" onclick="abrirModalDatosCliente()">Realizar Pedido por WhatsApp</button>
   </section>
 
+  <!-- Modal para seleccionar cantidad -->
   <div id="modalCantidad">
     <div id="modalContenido">
       <h3>¿Cuántas piezas deseas?</h3>
@@ -74,17 +104,32 @@
     </div>
   </div>
 
+  <!-- Modal para datos del cliente -->
+  <div id="modalDatosCliente">
+    <div id="modalDatosContenido">
+      <h3>Datos para el pedido</h3>
+      <label for="inputNombreCompleto">Nombre Completo</label>
+      <input type="text" id="inputNombreCompleto" placeholder="Nombre completo" required />
+      <label for="inputDomicilio">Domicilio</label>
+      <input type="text" id="inputDomicilio" placeholder="Domicilio" required />
+      <label for="inputCiudad">Ciudad</label>
+      <input type="text" id="inputCiudad" placeholder="Ciudad" required />
+      <label for="inputCodigoPostal">Código Postal</label>
+      <input type="text" id="inputCodigoPostal" placeholder="Código Postal" required />
+      <label for="inputEstado">Estado</label>
+      <input type="text" id="inputEstado" placeholder="Estado" required />
+      <br />
+      <button class="boton" onclick="confirmarDatosCliente()">Enviar Pedido</button>
+      <button class="boton" style="background:#999; margin-top:10px;" onclick="cerrarModalDatosCliente()">Cancelar</button>
+    </div>
+  </div>
+
   <footer>&copy; 2025 Lunamar Bags. C&C.</footer>
 
-  <!-- EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
-    (function(){
-      emailjs.init("user_abc123xyz"); // Reemplace con su User ID de EmailJS
-    })();
-  </script>
+    emailjs.init("YOUR_EMAILJS_USERID"); // Reemplace con su UserID EmailJS
 
-  <script>
     let carrito = {};
     let productoTemporal = {};
 
@@ -114,7 +159,7 @@
         lista.innerHTML += `
           <li>
             <div>
-              ${nombre}: 
+              ${nombre}:
               <input type="number" min="1" value="${item.cantidad}" onchange="actualizarCantidad('${nombre}', this.value)" />
               x $${precioUnitario.toFixed(2)} = $${(precioUnitario * item.cantidad).toFixed(2)}
             </div>
@@ -157,57 +202,87 @@
       renderCarrito();
     }
 
-    async function enviarEmail(pedidoTexto) {
-      try {
-        await emailjs.send('service_abc123', 'pedido_template', { // Reemplace con sus Service ID y Template ID
-          pedido: pedidoTexto,
-          email_destino: 'lic.cristian.garcia.s@gmail.com'
-        });
-        console.log('Correo enviado con éxito');
-      } catch (error) {
-        console.error('Error enviando correo:', error);
-        alert('Hubo un error enviando el correo. Intenta nuevamente.');
-      }
-    }
-
-    async function realizarPedido() {
+    function abrirModalDatosCliente() {
       if (Object.keys(carrito).length === 0) {
         alert("El carrito está vacío.");
         return;
       }
-      const numero = Math.random() < 0.5 ? '3481098508' : '3481070708';
+      document.getElementById('modalDatosCliente').style.display = 'flex';
+    }
 
-      let mensajeTexto = "Hola, quiero realizar el siguiente pedido de bolsas Lunamar:\n\n";
-      let mensajeWhatsapp = "Hola, quiero realizar el siguiente pedido de bolsas Lunamar:%0A";
-      let total = 0;
+    function cerrarModalDatosCliente() {
+      document.getElementById('modalDatosCliente').style.display = 'none';
+    }
+
+    async function confirmarDatosCliente() {
+      // Validar campos
+      const nombreCompleto = document.getElementById('inputNombreCompleto').value.trim();
+      const domicilio = document.getElementById('inputDomicilio').value.trim();
+      const ciudad = document.getElementById('inputCiudad').value.trim();
+      const codigoPostal = document.getElementById('inputCodigoPostal').value.trim();
+      const estado = document.getElementById('inputEstado').value.trim();
+
+      if (!nombreCompleto || !domicilio || !ciudad || !codigoPostal || !estado) {
+        alert("Por favor complete todos los campos.");
+        return;
+      }
+
+      // Construir mensaje y datos para envío
       const cantidadTotal = calcularTotalUnidades();
       const usarMayoreo = cantidadTotal >= 3;
-
+      let mensajeWhatsApp = `Hola, quiero realizar el siguiente pedido de bolsas Lunamar:%0A`;
+      let detallePedido = '';
+      let total = 0;
       for (const nombre in carrito) {
         const item = carrito[nombre];
         const precioUnitario = usarMayoreo ? item.precioMayoreo : item.precioMenudeo;
-        mensajeTexto += `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}\n`;
-        mensajeWhatsapp += `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}%0A`;
+        detallePedido += `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}\n`;
+        mensajeWhatsApp += `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}%0A`;
         total += precioUnitario * item.cantidad;
       }
+      mensajeWhatsApp += `%0ATotal: $${total.toFixed(2)} MXN%0A%0A`;
+      mensajeWhatsApp += `Datos del cliente:%0ANombre completo: ${encodeURIComponent(nombreCompleto)}%0ADomicilio: ${encodeURIComponent(domicilio)}%0ACiudad: ${encodeURIComponent(ciudad)}%0ACódigo Postal: ${encodeURIComponent(codigoPostal)}%0AEstado: ${encodeURIComponent(estado)}`;
 
-      mensajeTexto += `\nTotal: $${total.toFixed(2)} MXN`;
-      mensajeWhatsapp += `%0ATotal: $${total.toFixed(2)} MXN`;
+      // Datos para correo
+      const templateParams = {
+        nombre_cliente: nombreCompleto,
+        domicilio_cliente: domicilio,
+        ciudad_cliente: ciudad,
+        codigo_postal_cliente: codigoPostal,
+        estado_cliente: estado,
+        detalle_pedido: detallePedido.replace(/\n/g, '<br>'),
+        total_pedido: total.toFixed(2),
+        email_cliente: 'No aplica', // si desea capturar correo, añadir campo en modal y capturar aquí
+      };
 
-      // Enviar correo
-      await enviarEmail(mensajeTexto);
+      // Enviar correo vía EmailJS
+      try {
+        await emailjs.send('YOUR_EMAILJS_SERVICE_ID', 'YOUR_EMAILJS_TEMPLATE_ID', templateParams);
+        alert("Pedido enviado por correo y WhatsApp correctamente.");
+      } catch (error) {
+        alert("Error al enviar el correo: " + error.text || error);
+        return;
+      }
+
+      // Elegir número aleatorio para WhatsApp
+      const numeroWhatsApp = Math.random() < 0.5 ? '3481098508' : '3481070708';
 
       // Abrir WhatsApp con mensaje
-      window.open(`https://wa.me/52${numero}?text=${mensajeWhatsapp}`, '_blank');
+      window.open(`https://wa.me/52${numeroWhatsApp}?text=${mensajeWhatsApp}`, '_blank');
 
-      // Limpiar carrito y actualizar UI
+      // Limpiar carrito y cerrar modal
       carrito = {};
       renderCarrito();
-      toggleCarrito();
-      alert("Pedido realizado con éxito. Se envió el correo y se abrió WhatsApp.");
+      cerrarModalDatosCliente();
+
+      // Opcional: Limpiar campos
+      document.getElementById('inputNombreCompleto').value = '';
+      document.getElementById('inputDomicilio').value = '';
+      document.getElementById('inputCiudad').value = '';
+      document.getElementById('inputCodigoPostal').value = '';
+      document.getElementById('inputEstado').value = '';
     }
 
-    // Carga productos desde JSON externo
     fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
       .then(res => res.json())
       .then(data => {
@@ -217,10 +292,10 @@
             <div class="producto">
               <img src="${p.imagen}" alt="${p.nombre}" />
               <h3>${p.nombre}</h3>
-              <p>$${p.precioMayoreo} MXN (Mayoreo)</p>
-              <p>$${p.precioMenudeo} MXN (Menudeo)</p>
+              <p>$${p.precioMayoreo.toFixed(2)} MXN (Mayoreo)</p>
+              <p>$${p.precioMenudeo.toFixed(2)} MXN (Menudeo)</p>
               <p>${p.descripcion}</p>
-              <button class="boton" onclick="mostrarModal('${p.nombre}', ${p.precioMayoreo}, ${p.precioMenudeo})">Añadir al carrito</button>
+              <button class="boton" onclick="mostrarModal('${p.nombre.replace(/'/g,"\\'")}', ${p.precioMayoreo}, ${p.precioMenudeo})">Añadir al carrito</button>
             </div>
           `;
         });
