@@ -39,10 +39,10 @@
     <label>Nombre:
       <input type="text" id="nombre" required />
     </label>
-    <label>Precio Mayoreo (solo número):
+    <label>Precio Mayoreo:
       <input type="number" id="precioMayoreo" min="0" step="0.01" required />
     </label>
-    <label>Precio Menudeo (solo número):
+    <label>Precio Menudeo:
       <input type="number" id="precioMenudeo" min="0" step="0.01" required />
     </label>
     <label>Descripción:
@@ -50,6 +50,9 @@
     </label>
     <label>URL Imagen:
       <input type="url" id="imagen" required />
+    </label>
+    <label>Inventario Disponible:
+      <input type="number" id="inventario" min="0" step="1" required />
     </label>
     <button type="submit">Guardar Producto</button>
     <button type="button" id="cancelEdit" class="hidden" style="background:#999;">Cancelar Edición</button>
@@ -67,7 +70,6 @@
 <script>
 (function(){
   const PASSWORD = "lunamar2025";
-
   const loginDiv = document.getElementById('login');
   const adminDiv = document.getElementById('adminPanel');
   const loginBtn = document.getElementById('loginBtn');
@@ -91,9 +93,10 @@
     productos.forEach((p, i) => {
       const div = document.createElement('div');
       div.className = 'producto';
+      const estado = p.inventario <= 0 ? '<span style="color:red;">(Agotado)</span>' : `<span style="color:green;">(${p.inventario} disponibles)</span>`;
       div.innerHTML = `
         <img src="${p.imagen}" alt="${p.nombre}" />
-        <h3>${p.nombre}</h3>
+        <h3>${p.nombre} ${estado}</h3>
         <p><strong>Mayoreo:</strong> $${p.precioMayoreo} MXN</p>
         <p><strong>Menudeo:</strong> $${p.precioMenudeo} MXN</p>
         <p>${p.descripcion}</p>
@@ -125,7 +128,7 @@
     fetch(URL_PRODUCTOS_JSON)
       .then(res => res.json())
       .then(data => {
-        productos = data;
+        productos = data.map(p => ({ ...p, inventario: p.inventario || 0 }));
         renderProductos();
       })
       .catch(() => {
@@ -152,7 +155,8 @@
       precioMayoreo: parseFloat(document.getElementById('precioMayoreo').value),
       precioMenudeo: parseFloat(document.getElementById('precioMenudeo').value),
       descripcion: document.getElementById('descripcion').value.trim(),
-      imagen: document.getElementById('imagen').value.trim()
+      imagen: document.getElementById('imagen').value.trim(),
+      inventario: parseInt(document.getElementById('inventario').value)
     };
 
     if (index === -1) {
@@ -196,11 +200,10 @@
     document.getElementById('precioMenudeo').value = p.precioMenudeo;
     document.getElementById('descripcion').value = p.descripcion;
     document.getElementById('imagen').value = p.imagen;
+    document.getElementById('inventario').value = p.inventario || 0;
     cancelEditBtn.classList.remove('hidden');
-    // Scroll suave al formulario
     document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
   }
-
 })();
 </script>
 
