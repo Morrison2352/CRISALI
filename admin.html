@@ -6,44 +6,54 @@
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background: #fffbe7; }
     label { display: block; margin-top: 10px; }
-    input, textarea { width: 100%; padding: 8px; margin-top: 5px; }
+    input, textarea { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
     button { margin-top: 20px; padding: 10px 20px; background: #6a4e77; color: white; border: none; cursor: pointer; }
     pre { background: #f5f5f5; padding: 10px; margin-top: 20px; white-space: pre-wrap; }
   </style>
 </head>
 <body>
   <h1>Agregar nuevo producto</h1>
-  <label>Nombre: <input id="nombre" type="text" /></label>
-  <label>Precio Mayoreo (sin símbolo $): <input id="mayoreo" type="number" min="0" step="0.01" /></label>
-  <label>Precio Menudeo (sin símbolo $): <input id="menudeo" type="number" min="0" step="0.01" /></label>
-  <label>Descripción: <textarea id="descripcion"></textarea></label>
-  <label>Imagen URL: <input id="imagen" type="url" /></label>
-  <label>Número de WhatsApp (521xxxxxxxxxx): <input id="whatsapp" type="tel" pattern="521[0-9]{10}" placeholder="Ej: 5213481070708" /></label>
-  <button onclick="generar()">Generar JSON</button>
+
+  <label>Nombre: <input id="nombre" type="text" required /></label>
+  <label>Precio Mayoreo (sin símbolo $): <input id="mayoreo" type="number" min="0" step="0.01" required /></label>
+  <label>Precio Menudeo (sin símbolo $): <input id="menudeo" type="number" min="0" step="0.01" required /></label>
+  <label>Descripción: <textarea id="descripcion" required></textarea></label>
+  <label>Imagen URL: <input id="imagen" type="url" required /></label>
+  <label>Número de WhatsApp (521xxxxxxxxxx): <input id="whatsapp" type="tel" pattern="521[0-9]{10}" placeholder="Ej: 5213481070708" required /></label>
+
+  <button id="generar">Generar JSON</button>
   <pre id="salida"></pre>
 
   <script>
-    function generar() {
-      // Validar que precios sean números válidos
-      const mayoreo = parseFloat(document.getElementById('mayoreo').value);
-      const menudeo = parseFloat(document.getElementById('menudeo').value);
+    document.getElementById('generar').addEventListener('click', function (e) {
+      e.preventDefault();
 
-      if (isNaN(mayoreo) || isNaN(menudeo)) {
-        alert('Por favor, ingresa precios válidos sin el símbolo $.');
+      const nombre = document.getElementById('nombre').value.trim();
+      const mayoreoStr = document.getElementById('mayoreo').value.trim();
+      const menudeoStr = document.getElementById('menudeo').value.trim();
+      const descripcion = document.getElementById('descripcion').value.trim();
+      const imagen = document.getElementById('imagen').value.trim();
+      const whatsapp = document.getElementById('whatsapp').value.trim();
+
+      const precioMayoreo = parseFloat(mayoreoStr);
+      const precioMenudeo = parseFloat(menudeoStr);
+
+      if (!nombre || isNaN(precioMayoreo) || isNaN(precioMenudeo) || !descripcion || !imagen || !whatsapp) {
+        alert('Por favor completa todos los campos correctamente.');
         return;
       }
 
       const producto = {
-        nombre: document.getElementById('nombre').value.trim(),
-        precioMayoreo: mayoreo,
-        precioMenudeo: menudeo,
-        descripcion: document.getElementById('descripcion').value.trim(),
-        imagen: document.getElementById('imagen').value.trim(),
-        whatsapp: document.getElementById('whatsapp').value.trim()
+        nombre,
+        precioMayoreo,
+        precioMenudeo,
+        descripcion,
+        imagen,
+        whatsapp
       };
 
       document.getElementById('salida').textContent = JSON.stringify(producto, null, 2) + ',';
-    }
+    });
   </script>
 </body>
 </html>
