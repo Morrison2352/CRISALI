@@ -33,7 +33,7 @@
 <div id="adminPanel" class="hidden">
   <h1>Gestión de Productos</h1>
 
-  <h2>Agregar / Editar Producto</h2>
+  <h2 id="formSection">Agregar / Editar Producto</h2>
   <form id="productForm">
     <input type="hidden" id="editIndex" value="-1" />
     <label>Nombre:
@@ -197,6 +197,8 @@
     document.getElementById('descripcion').value = p.descripcion;
     document.getElementById('imagen').value = p.imagen;
     cancelEditBtn.classList.remove('hidden');
+    // Scroll suave al formulario
+    document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
   }
 
 })();
