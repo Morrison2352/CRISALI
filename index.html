@@ -21,28 +21,16 @@
     #carrito li { margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
     #carrito li > div { flex-grow: 1; }
     input[type='number'] { width: 60px; padding: 5px; margin-right: 10px; }
-    .btn-eliminar {
-      background: #c0392b;
-      border: none;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+    .btn-eliminar { background: #c0392b; border: none; color: white; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
     #verCarritoBtn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #6a4e77;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 50px;
-      cursor: pointer;
-      z-index: 1500;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      position: fixed; bottom: 20px; right: 20px;
+      background: #6a4e77; color: white; border: none;
+      padding: 10px 15px; border-radius: 50px; cursor: pointer;
+      z-index: 1500; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
-    #modalCantidad { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 2000; }
+    #modalCantidad { display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+      justify-content: center; align-items: center; z-index: 2000; }
     #modalContenido { background: white; padding: 20px; border-radius: 10px; text-align: center; max-width: 300px; }
   </style>
 </head>
@@ -97,7 +85,6 @@
       let total = 0;
       let cantidadTotal = calcularTotalUnidades();
 
-      // Si total de unidades >= 3, se usa precio mayoreo para todos
       const usarMayoreo = cantidadTotal >= 3;
 
       for (const nombre in carrito) {
@@ -107,7 +94,7 @@
         lista.innerHTML += `
           <li>
             <div>
-              ${nombre}: 
+              ${nombre}:
               <input type="number" min="1" value="${item.cantidad}" onchange="actualizarCantidad('${nombre}', this.value)" />
               x $${precioUnitario.toFixed(2)} = $${(precioUnitario * item.cantidad).toFixed(2)}
             </div>
@@ -158,14 +145,32 @@
       const cantidadTotal = calcularTotalUnidades();
       const usarMayoreo = cantidadTotal >= 3;
 
+      const notaVentana = window.open('', '_blank');
+      notaVentana.document.write('<html><head><title>Nota de Remisión</title></head><body><h2>Nota de Pedido - Lunamar Bags</h2><ul>');
+
       for (const nombre in carrito) {
         const item = carrito[nombre];
         const precioUnitario = usarMayoreo ? item.precioMayoreo : item.precioMenudeo;
-        mensaje += `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}%0A`;
+        const linea = `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}`;
+        mensaje += `${linea}%0A`;
         total += precioUnitario * item.cantidad;
+        notaVentana.document.write(`<li>${linea}</li>`);
       }
       mensaje += `%0ATotal: $${total.toFixed(2)} MXN`;
+      notaVentana.document.write(`</ul><p><strong>Total:</strong> $${total.toFixed(2)} MXN</p></body></html>`);
+      notaVentana.document.close();
+
+      const correo = "lic.cristian.garcia.s@gmail.com";
+      const asunto = "Nuevo Pedido Lunamar Bags";
+      const cuerpo = decodeURIComponent(mensaje.replace(/%0A/g, '\n'));
+      const mailtoLink = `mailto:${correo}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+      window.location.href = mailtoLink;
+
       window.open(`https://wa.me/52${numero}?text=${mensaje}`, '_blank');
+
+      carrito = {};
+      renderCarrito();
+      toggleCarrito();
     }
 
     fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
