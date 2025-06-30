@@ -15,11 +15,20 @@
     .producto img { max-width: 100%; border-radius: 8px; }
     .producto h3 { color: #6a4e77; margin: 10px 0; }
     .boton { background: #6a4e77; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; display: inline-block; margin-top: 10px; cursor: pointer; }
-    #carrito { padding: 20px; background: #fff3f6; border-top: 2px solid #e0a5c0; position: fixed; top: 80px; right: 20px; width: 300px; max-height: 80vh; overflow-y: auto; box-shadow: 0 0 10px rgba(0,0,0,0.2); display: none; z-index: 1000; }
+    #carrito { padding: 20px; background: #fff3f6; border-top: 2px solid #e0a5c0; position: fixed; top: 80px; right: 20px; width: 320px; max-height: 80vh; overflow-y: auto; box-shadow: 0 0 10px rgba(0,0,0,0.2); display: none; z-index: 1000; }
     #carrito h2 { color: #6a4e77; }
     #carrito ul { list-style: none; padding: 0; }
-    #carrito li { margin-bottom: 10px; }
-    input[type='number'] { width: 60px; padding: 5px; }
+    #carrito li { margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+    #carrito li > div { flex-grow: 1; }
+    input[type='number'] { width: 60px; padding: 5px; margin-right: 10px; }
+    .btn-eliminar {
+      background: #c0392b;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
     #verCarritoBtn {
       position: fixed;
       bottom: 20px;
@@ -90,7 +99,12 @@
         cantidadTotal += item.cantidad;
         lista.innerHTML += `
           <li>
-            ${nombre}: <input type="number" min="1" value="${item.cantidad}" onchange="actualizarCantidad('${nombre}', this.value)" /> x $${precioUnitario} = $${(precioUnitario * item.cantidad).toFixed(2)}
+            <div>
+              ${nombre}: 
+              <input type="number" min="1" value="${item.cantidad}" onchange="actualizarCantidad('${nombre}', this.value)" />
+              x $${precioUnitario} = $${(precioUnitario * item.cantidad).toFixed(2)}
+            </div>
+            <button class="btn-eliminar" onclick="eliminarProducto('${nombre}')">Eliminar</button>
           </li>
         `;
       }
@@ -104,6 +118,11 @@
         carrito[nombre].cantidad = cantidad;
         renderCarrito();
       }
+    }
+
+    function eliminarProducto(nombre) {
+      delete carrito[nombre];
+      renderCarrito();
     }
 
     function mostrarModal(nombre, precioMayoreo, precioMenudeo) {
