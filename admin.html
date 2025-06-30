@@ -2,58 +2,203 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Panel de Administración - Lunamar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel de Administración - Lunamar Bags</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #fffbe7; }
-    label { display: block; margin-top: 10px; }
-    input, textarea { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
-    button { margin-top: 20px; padding: 10px 20px; background: #6a4e77; color: white; border: none; cursor: pointer; }
-    pre { background: #f5f5f5; padding: 10px; margin-top: 20px; white-space: pre-wrap; }
+    body { font-family: Arial, sans-serif; background: #fffbe7; margin: 0; padding: 20px; }
+    #login, #adminPanel { max-width: 700px; margin: auto; }
+    h1 { color: #6a4e77; text-align: center; }
+    label { display: block; margin: 15px 0 5px; }
+    input, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
+    button { background: #6a4e77; color: white; border: none; padding: 10px 20px; margin-top: 15px; cursor: pointer; border-radius: 5px; }
+    .producto { background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .producto img { max-width: 100px; border-radius: 8px; display: block; margin-bottom: 10px; }
+    .producto-buttons button { margin-right: 10px; }
+    #productosList { margin-top: 20px; }
+    #exportJson { white-space: pre-wrap; background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 20px; font-family: monospace; max-height: 300px; overflow-y: auto; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <h1>Agregar nuevo producto</h1>
 
-  <label>Nombre: <input id="nombre" type="text" required /></label>
-  <label>Precio Mayoreo (sin símbolo $): <input id="mayoreo" type="number" min="0" step="0.01" required /></label>
-  <label>Precio Menudeo (sin símbolo $): <input id="menudeo" type="number" min="0" step="0.01" required /></label>
-  <label>Descripción: <textarea id="descripcion" required></textarea></label>
-  <label>Imagen URL: <input id="imagen" type="url" required /></label>
-  <label>Número de WhatsApp (521xxxxxxxxxx): <input id="whatsapp" type="tel" pattern="521[0-9]{10}" placeholder="Ej: 5213481070708" required /></label>
+<div id="login">
+  <h1>Panel de Administración - Lunamar Bags</h1>
+  <label for="passwordInput">Contraseña:</label>
+  <input type="password" id="passwordInput" placeholder="Ingresa la contraseña" />
+  <button id="loginBtn">Entrar</button>
+  <p id="loginError" style="color:red; display:none;">Contraseña incorrecta, intenta de nuevo.</p>
+</div>
 
-  <button id="generar">Generar JSON</button>
-  <pre id="salida"></pre>
+<div id="adminPanel" class="hidden">
+  <h1>Gestión de Productos</h1>
 
-  <script>
-    document.getElementById('generar').addEventListener('click', function (e) {
-      e.preventDefault();
+  <h2>Agregar / Editar Producto</h2>
+  <form id="productForm">
+    <input type="hidden" id="editIndex" value="-1" />
+    <label>Nombre:
+      <input type="text" id="nombre" required />
+    </label>
+    <label>Precio Mayoreo (solo número):
+      <input type="number" id="precioMayoreo" min="0" step="0.01" required />
+    </label>
+    <label>Precio Menudeo (solo número):
+      <input type="number" id="precioMenudeo" min="0" step="0.01" required />
+    </label>
+    <label>Descripción:
+      <textarea id="descripcion" required></textarea>
+    </label>
+    <label>URL Imagen:
+      <input type="url" id="imagen" required />
+    </label>
+    <label>WhatsApp (ejemplo: 5213481070708):
+      <input type="tel" id="whatsapp" pattern="521[0-9]{10}" placeholder="521xxxxxxxxxx" required />
+    </label>
+    <button type="submit">Guardar Producto</button>
+    <button type="button" id="cancelEdit" class="hidden" style="background:#999;">Cancelar Edición</button>
+  </form>
 
-      const nombre = document.getElementById('nombre').value.trim();
-      const mayoreoStr = document.getElementById('mayoreo').value.trim();
-      const menudeoStr = document.getElementById('menudeo').value.trim();
-      const descripcion = document.getElementById('descripcion').value.trim();
-      const imagen = document.getElementById('imagen').value.trim();
-      const whatsapp = document.getElementById('whatsapp').value.trim();
+  <h2>Productos Actuales</h2>
+  <div id="productosList"></div>
 
-      const precioMayoreo = parseFloat(mayoreoStr);
-      const precioMenudeo = parseFloat(menudeoStr);
+  <h2>JSON Exportado</h2>
+  <pre id="exportJson"></pre>
+</div>
 
-      if (!nombre || isNaN(precioMayoreo) || isNaN(precioMenudeo) || !descripcion || !imagen || !whatsapp) {
-        alert('Por favor completa todos los campos correctamente.');
-        return;
+<script>
+  (function(){
+    const PASSWORD = "lunamar2025";
+
+    const loginDiv = document.getElementById('login');
+    const adminDiv = document.getElementById('adminPanel');
+    const loginBtn = document.getElementById('loginBtn');
+    const passwordInput = document.getElementById('passwordInput');
+    const loginError = document.getElementById('loginError');
+
+    const productosList = document.getElementById('productosList');
+    const exportJson = document.getElementById('exportJson');
+    const productForm = document.getElementById('productForm');
+    const editIndexInput = document.getElementById('editIndex');
+    const cancelEditBtn = document.getElementById('cancelEdit');
+
+    let productos = [];
+
+    // Carga inicial de productos (puedes cambiar la URL a la de tu repositorio)
+    const URL_PRODUCTOS_JSON = "https://morrison2352.github.io/lunamar-landing/productos.json";
+
+    function renderProductos() {
+      productosList.innerHTML = '';
+      productos.forEach((p, i) => {
+        const div = document.createElement('div');
+        div.className = 'producto';
+        div.innerHTML = `
+          <img src="${p.imagen}" alt="${p.nombre}" />
+          <h3>${p.nombre}</h3>
+          <p><strong>Mayoreo:</strong> $${p.precioMayoreo} MXN</p>
+          <p><strong>Menudeo:</strong> $${p.precioMenudeo} MXN</p>
+          <p>${p.descripcion}</p>
+          <p><strong>WhatsApp:</strong> ${p.whatsapp}</p>
+          <div class="producto-buttons">
+            <button data-index="${i}" class="editarBtn">Editar</button>
+            <button data-index="${i}" class="eliminarBtn" style="background:#c0392b;">Eliminar</button>
+          </div>
+        `;
+        productosList.appendChild(div);
+      });
+      exportarJSON();
+    }
+
+    function exportarJSON() {
+      exportJson.textContent = JSON.stringify(productos, null, 2);
+    }
+
+    // Carga productos desde URL
+    function cargarProductos() {
+      fetch(URL_PRODUCTOS_JSON)
+        .then(res => res.json())
+        .then(data => {
+          productos = data;
+          renderProductos();
+        })
+        .catch(() => {
+          productos = [];
+          renderProductos();
+        });
+    }
+
+    // Login
+    loginBtn.addEventListener('click', () => {
+      if (passwordInput.value === PASSWORD) {
+        loginDiv.classList.add('hidden');
+        adminDiv.classList.remove('hidden');
+        cargarProductos();
+      } else {
+        loginError.style.display = 'block';
       }
+    });
 
-      const producto = {
-        nombre,
-        precioMayoreo,
-        precioMenudeo,
-        descripcion,
-        imagen,
-        whatsapp
+    // Agregar / Editar Producto
+    productForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const index = parseInt(editIndexInput.value);
+      const nuevoProducto = {
+        nombre: document.getElementById('nombre').value.trim(),
+        precioMayoreo: parseFloat(document.getElementById('precioMayoreo').value),
+        precioMenudeo: parseFloat(document.getElementById('precioMenudeo').value),
+        descripcion: document.getElementById('descripcion').value.trim(),
+        imagen: document.getElementById('imagen').value.trim(),
+        whatsapp: document.getElementById('whatsapp').value.trim()
       };
 
-      document.getElementById('salida').textContent = JSON.stringify(producto, null, 2) + ',';
+      if (index === -1) {
+        productos.push(nuevoProducto);
+      } else {
+        productos[index] = nuevoProducto;
+      }
+      resetForm();
+      renderProductos();
     });
-  </script>
+
+    // Reset formulario
+    function resetForm() {
+      editIndexInput.value = -1;
+      productForm.reset();
+      cancelEditBtn.classList.add('hidden');
+    }
+
+    // Botón cancelar edición
+    cancelEditBtn.addEventListener('click', () => {
+      resetForm();
+    });
+
+    // Delegación para botones Editar y Eliminar
+    productosList.addEventListener('click', e => {
+      if (e.target.classList.contains('editarBtn')) {
+        const i = parseInt(e.target.dataset.index);
+        cargarFormParaEdicion(i);
+      }
+      if (e.target.classList.contains('eliminarBtn')) {
+        const i = parseInt(e.target.dataset.index);
+        if (confirm(`¿Eliminar producto "${productos[i].nombre}"?`)) {
+          productos.splice(i,1);
+          renderProductos();
+        }
+      }
+    });
+
+    function cargarFormParaEdicion(i) {
+      const p = productos[i];
+      editIndexInput.value = i;
+      document.getElementById('nombre').value = p.nombre;
+      document.getElementById('precioMayoreo').value = p.precioMayoreo;
+      document.getElementById('precioMenudeo').value = p.precioMenudeo;
+      document.getElementById('descripcion').value = p.descripcion;
+      document.getElementById('imagen').value = p.imagen;
+      document.getElementById('whatsapp').value = p.whatsapp;
+      cancelEditBtn.classList.remove('hidden');
+    }
+
+  })();
+</script>
+
 </body>
 </html>
