@@ -85,24 +85,31 @@
       carritoSection.style.display = carritoSection.style.display === 'none' ? 'block' : 'none';
     }
 
+    function calcularTotalUnidades() {
+      return Object.values(carrito).reduce((acc, item) => acc + item.cantidad, 0);
+    }
+
     function renderCarrito() {
       const lista = document.getElementById('listaCarrito');
       const totalSpan = document.getElementById('total');
       const contador = document.getElementById('contadorCarrito');
       lista.innerHTML = '';
       let total = 0;
-      let cantidadTotal = 0;
+      let cantidadTotal = calcularTotalUnidades();
+
+      // Si total de unidades >= 3, se usa precio mayoreo para todos
+      const usarMayoreo = cantidadTotal >= 3;
+
       for (const nombre in carrito) {
         const item = carrito[nombre];
-        const precioUnitario = item.cantidad >= 3 ? item.precioMayoreo : item.precioMenudeo;
+        const precioUnitario = usarMayoreo ? item.precioMayoreo : item.precioMenudeo;
         total += precioUnitario * item.cantidad;
-        cantidadTotal += item.cantidad;
         lista.innerHTML += `
           <li>
             <div>
               ${nombre}: 
               <input type="number" min="1" value="${item.cantidad}" onchange="actualizarCantidad('${nombre}', this.value)" />
-              x $${precioUnitario} = $${(precioUnitario * item.cantidad).toFixed(2)}
+              x $${precioUnitario.toFixed(2)} = $${(precioUnitario * item.cantidad).toFixed(2)}
             </div>
             <button class="btn-eliminar" onclick="eliminarProducto('${nombre}')">Eliminar</button>
           </li>
@@ -148,10 +155,13 @@
       const numero = Math.random() < 0.5 ? '3481098508' : '3481070708';
       let mensaje = "Hola, quiero realizar el siguiente pedido de bolsas Lunamar:%0A";
       let total = 0;
+      const cantidadTotal = calcularTotalUnidades();
+      const usarMayoreo = cantidadTotal >= 3;
+
       for (const nombre in carrito) {
         const item = carrito[nombre];
-        const precioUnitario = item.cantidad >= 3 ? item.precioMayoreo : item.precioMenudeo;
-        mensaje += `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario} = $${(item.cantidad * precioUnitario).toFixed(2)}%0A`;
+        const precioUnitario = usarMayoreo ? item.precioMayoreo : item.precioMenudeo;
+        mensaje += `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}%0A`;
         total += precioUnitario * item.cantidad;
       }
       mensaje += `%0ATotal: $${total.toFixed(2)} MXN`;
