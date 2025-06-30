@@ -1,19 +1,26 @@
-<!DOCTYPE html>More actions
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lunamar Bags | Catálogo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
     body { font-family: 'Poppins', sans-serif; background: #fdf6f9; margin: 0; padding: 0; color: #333; }
     header, footer { background: #f0d7e7; text-align: center; padding: 20px; position: relative; }
-@@ -21,16 +21,28 @@
+    header h1 { margin: 10px 0 0; color: #6a4e77; }
+    .logo { max-width: 180px; margin-bottom: 10px; }
+    .catalogo { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 40px; }
+    .producto { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; }
+    .producto img { max-width: 100%; border-radius: 8px; }
+    .producto h3 { color: #6a4e77; margin: 10px 0; }
+    .boton { background: #6a4e77; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; display: inline-block; margin-top: 10px; cursor: pointer; }
+    #carrito { padding: 20px; background: #fff3f6; border-top: 2px solid #e0a5c0; position: fixed; top: 80px; right: 20px; width: 320px; max-height: 80vh; overflow-y: auto; box-shadow: 0 0 10px rgba(0,0,0,0.2); display: none; z-index: 1000; }
+    #carrito h2 { color: #6a4e77; }
+    #carrito ul { list-style: none; padding: 0; }
     #carrito li { margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
     #carrito li > div { flex-grow: 1; }
     input[type='number'] { width: 60px; padding: 5px; margin-right: 10px; }
-    .btn-eliminar { background: #c0392b; border: none; color: white; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
     .btn-eliminar {
       background: #c0392b;
       border: none;
@@ -23,10 +30,6 @@
       cursor: pointer;
     }
     #verCarritoBtn {
-      position: fixed; bottom: 20px; right: 20px;
-      background: #6a4e77; color: white; border: none;
-      padding: 10px 15px; border-radius: 50px; cursor: pointer;
-      z-index: 1500; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       position: fixed;
       bottom: 20px;
       right: 20px;
@@ -39,19 +42,32 @@
       z-index: 1500;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
-    #modalCantidad { display: none; position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%; background: rgba(0,0,0,0.6);
-      justify-content: center; align-items: center; z-index: 2000; }
     #modalCantidad { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 2000; }
     #modalContenido { background: white; padding: 20px; border-radius: 10px; text-align: center; max-width: 300px; }
   </style>
 </head>
-@@ -56,14 +68,22 @@
+<body>
+  <header>
+    <img src="https://raw.githubusercontent.com/Morrison2352/lunamar-landing/refs/heads/main/LUNAMAR-BAGS.png" alt="Lunamar Bags Logo" class="logo" />
+    <h1>Lunamar Bags</h1>
+    <p>Catálogo de productos</p>
+    <a href="https://chat.whatsapp.com/HRqdgVHHkQI4mX08EzUAx1" class="boton" target="_blank">Únete al Grupo de WhatsApp</a>
+  </header>
+
+  <button id="verCarritoBtn" onclick="toggleCarrito()">🛒 Ver Carrito (<span id="contadorCarrito">0</span>)</button>
+
+  <section class="catalogo" id="catalogo"></section>
+
+  <section id="carrito">
+    <h2>Carrito de Compras</h2>
+    <ul id="listaCarrito"></ul>
+    <p>Total: $<span id="total">0.00</span> MXN</p>
+    <button class="boton" onclick="realizarPedido()">Realizar Pedido por WhatsApp</button>
+  </section>
+
   <div id="modalCantidad">
     <div id="modalContenido">
       <h3>¿Cuántas piezas deseas?</h3>
-      <input type="number" id="cantidadSeleccionada" min="1" value="1">
-      <br><br>
       <input type="number" id="cantidadSeleccionada" min="1" value="1" />
       <br /><br />
       <button class="boton" onclick="confirmarCantidad()">Aceptar</button>
@@ -71,21 +87,76 @@
   <script>
     let carrito = {};
     let productoTemporal = {};
-@@ -94,7 +114,7 @@
-        lista.innerHTML += `
+
+    function toggleCarrito() {
+      const carritoSection = document.getElementById('carrito');
+      carritoSection.style.display = carritoSection.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function calcularTotalUnidades() {
+      return Object.values(carrito).reduce((acc, item) => acc + item.cantidad, 0);
+    }
+
+    function renderCarrito() {
+      const lista = document.getElementById('listaCarrito');
+      const totalSpan = document.getElementById('total');
+      const contador = document.getElementById('contadorCarrito');
+      lista.innerHTML = '';
+      let total = 0;
+      let cantidadTotal = calcularTotalUnidades();
+
+      const usarMayoreo = cantidadTotal >= 3;
+
+      for (const nombre in carrito) {
+        const item = carrito[nombre];
+        const precioUnitario = usarMayoreo ? item.precioMayoreo : item.precioMenudeo;
+        total += precioUnitario * item.cantidad;
+        lista.innerHTML += 
           <li>
             <div>
-              ${nombre}:
               ${nombre}: 
               <input type="number" min="1" value="${item.cantidad}" onchange="actualizarCantidad('${nombre}', this.value)" />
               x $${precioUnitario.toFixed(2)} = $${(precioUnitario * item.cantidad).toFixed(2)}
             </div>
-@@ -137,62 +157,77 @@
+            <button class="btn-eliminar" onclick="eliminarProducto('${nombre}')">Eliminar</button>
+          </li>
+        ;
+      }
+      totalSpan.textContent = total.toFixed(2);
+      contador.textContent = cantidadTotal;
+    }
+
+    function actualizarCantidad(nombre, nuevaCantidad) {
+      const cantidad = parseInt(nuevaCantidad);
+      if (cantidad >= 1) {
+        carrito[nombre].cantidad = cantidad;
+        renderCarrito();
+      }
+    }
+
+    function eliminarProducto(nombre) {
+      delete carrito[nombre];
       renderCarrito();
     }
 
-    function realizarPedido() {
-      if (Object.keys(carrito).length === 0) return alert("El carrito está vacío.");
+    function mostrarModal(nombre, precioMayoreo, precioMenudeo) {
+      productoTemporal = { nombre, precioMayoreo, precioMenudeo };
+      document.getElementById('cantidadSeleccionada').value = 1;
+      document.getElementById('modalCantidad').style.display = 'flex';
+    }
+
+    function confirmarCantidad() {
+      const cantidad = parseInt(document.getElementById('cantidadSeleccionada').value);
+      const { nombre, precioMayoreo, precioMenudeo } = productoTemporal;
+      if (!carrito[nombre]) {
+        carrito[nombre] = { cantidad, precioMayoreo, precioMenudeo };
+      } else {
+        carrito[nombre].cantidad += cantidad;
+      }
+      document.getElementById('modalCantidad').style.display = 'none';
+      renderCarrito();
+    }
+
     async function enviarEmail(pedidoTexto) {
       try {
         await emailjs.send('service_abc123', 'pedido_template', { // Reemplace con sus Service ID y Template ID
@@ -105,7 +176,6 @@
         return;
       }
       const numero = Math.random() < 0.5 ? '3481098508' : '3481070708';
-      let mensaje = "Hola, quiero realizar el siguiente pedido de bolsas Lunamar:%0A";
 
       let mensajeTexto = "Hola, quiero realizar el siguiente pedido de bolsas Lunamar:\n\n";
       let mensajeWhatsapp = "Hola, quiero realizar el siguiente pedido de bolsas Lunamar:%0A";
@@ -113,37 +183,22 @@
       const cantidadTotal = calcularTotalUnidades();
       const usarMayoreo = cantidadTotal >= 3;
 
-      const notaVentana = window.open('', '_blank');
-      notaVentana.document.write('<html><head><title>Nota de Remisión</title></head><body><h2>Nota de Pedido - Lunamar Bags</h2><ul>');
-
       for (const nombre in carrito) {
         const item = carrito[nombre];
         const precioUnitario = usarMayoreo ? item.precioMayoreo : item.precioMenudeo;
-        const linea = `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}`;
-        mensaje += `${linea}%0A`;
-        mensajeTexto += `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}\n`;
-        mensajeWhatsapp += `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}%0A`;
+        mensajeTexto += - ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}\n;
+        mensajeWhatsapp += - ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}%0A;
         total += precioUnitario * item.cantidad;
-        notaVentana.document.write(`<li>${linea}</li>`);
       }
-      mensaje += `%0ATotal: $${total.toFixed(2)} MXN`;
-      notaVentana.document.write(`</ul><p><strong>Total:</strong> $${total.toFixed(2)} MXN</p></body></html>`);
-      notaVentana.document.close();
 
-      const correo = "lic.cristian.garcia.s@gmail.com";
-      const asunto = "Nuevo Pedido Lunamar Bags";
-      const cuerpo = decodeURIComponent(mensaje.replace(/%0A/g, '\n'));
-      const mailtoLink = `mailto:${correo}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-      window.location.href = mailtoLink;
-      mensajeTexto += `\nTotal: $${total.toFixed(2)} MXN`;
-      mensajeWhatsapp += `%0ATotal: $${total.toFixed(2)} MXN`;
+      mensajeTexto += \nTotal: $${total.toFixed(2)} MXN;
+      mensajeWhatsapp += %0ATotal: $${total.toFixed(2)} MXN;
 
       // Enviar correo
       await enviarEmail(mensajeTexto);
 
-      window.open(`https://wa.me/52${numero}?text=${mensaje}`, '_blank');
       // Abrir WhatsApp con mensaje
-      window.open(`https://wa.me/52${numero}?text=${mensajeWhatsapp}`, '_blank');
+      window.open(https://wa.me/52${numero}?text=${mensajeWhatsapp}, '_blank');
 
       // Limpiar carrito y actualizar UI
       carrito = {};
@@ -158,7 +213,7 @@
       .then(data => {
         const contenedor = document.getElementById('catalogo');
         data.forEach(p => {
-          contenedor.innerHTML += `
+          contenedor.innerHTML += 
             <div class="producto">
               <img src="${p.imagen}" alt="${p.nombre}" />
               <h3>${p.nombre}</h3>
@@ -167,7 +222,7 @@
               <p>${p.descripcion}</p>
               <button class="boton" onclick="mostrarModal('${p.nombre}', ${p.precioMayoreo}, ${p.precioMenudeo})">Añadir al carrito</button>
             </div>
-          `;
+          ;
         });
       })
       .catch(error => {
