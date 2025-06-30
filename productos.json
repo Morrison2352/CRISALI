@@ -33,18 +33,16 @@
   },
   {
     "nombre": "BOLSA X32",
-    "precioMayoreo": 600,
-    "precioMenudeo": 350,
+    "precioMayoreo": 350,
+    "precioMenudeo": 600,
     "descripcion": "MEJORES MARCAS AL MEJOR PRECIO",
-    "imagen": "https://e00-expansion.uecdn.es/assets/multimedia/imagenes/2022/04/04/16490642289634.jpg",
-    "whatsapp": "5213481098508"
+    "imagen": "https://e00-expansion.uecdn.es/assets/multimedia/imagenes/2022/04/04/16490642289634.jpg"
   },
   {
     "nombre": "BOLSA FERREL",
-    "precioMayoreo": 800,
-    "precioMenudeo": 550,
+    "precioMayoreo": 550,
+    "precioMenudeo": 800,
     "descripcion": "PONTE A LA MODA CON ESTA BOLSA",
-    "imagen": "https://cdn-images.farfetch-contents.com/19/45/46/40/19454640_43296168_1000.jpg",
-    "whatsapp": "5213481070708"
+    "imagen": "https://cdn-images.farfetch-contents.com/19/45/46/40/19454640_43296168_1000.jpg"
   }
 ]
