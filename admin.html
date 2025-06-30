@@ -63,6 +63,7 @@
   <div id="productosList"></div>
 
   <h2>JSON Exportado</h2>
+  <button id="copiarJsonBtn">Copiar JSON</button>
   <pre id="exportJson"></pre>
 </div>
 
@@ -82,6 +83,7 @@
   const editIndexInput = document.getElementById('editIndex');
   const cancelEditBtn = document.getElementById('cancelEdit');
   const contadorProductos = document.getElementById('contadorProductos');
+  const copiarJsonBtn = document.getElementById('copiarJsonBtn');
 
   let productos = [];
 
@@ -113,6 +115,15 @@
   function exportarJSON() {
     exportJson.textContent = JSON.stringify(productos, null, 2);
   }
+
+  copiarJsonBtn.addEventListener('click', () => {
+    const jsonText = exportJson.textContent;
+    navigator.clipboard.writeText(jsonText).then(() => {
+      alert("JSON copiado al portapapeles.");
+    }).catch(err => {
+      alert("Error al copiar el JSON: " + err);
+    });
+  });
 
   function cargarProductos() {
     fetch(URL_PRODUCTOS_JSON)
