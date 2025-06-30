@@ -88,6 +88,7 @@
     productos.forEach((p, i) => {
       const div = document.createElement('div');
       div.className = 'producto';
+      div.setAttribute('data-producto-id', `producto-${i}`);
       div.innerHTML = `
         <img src="${p.imagen}" alt="${p.nombre}" />
         <h3>${p.nombre}</h3>
@@ -151,6 +152,13 @@
     resetForm();
     renderProductos();
     saveProductos();
+
+    setTimeout(() => {
+      const target = document.querySelector(`[data-producto-id='producto-${index === -1 ? productos.length - 1 : index}']`);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   });
 
   function resetForm() {
