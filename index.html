@@ -8,7 +8,8 @@
   <style>
     body { font-family: 'Poppins', sans-serif; background: #fdf6f9; margin: 0; padding: 0; color: #333; }
     header, footer { background: #f0d7e7; text-align: center; padding: 20px; }
-    header h1 { margin: 0; color: #6a4e77; }
+    header h1 { margin: 10px 0 0; color: #6a4e77; }
+    .logo { max-width: 180px; margin-bottom: 10px; }
     .catalogo { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 40px; }
     .producto { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; }
     .producto img { max-width: 100%; border-radius: 8px; }
@@ -18,11 +19,16 @@
 </head>
 <body>
   <header>
+    <img src="https://raw.githubusercontent.com/Morrison2352/lunamar-landing/refs/heads/main/LUNAMAR-BAGS.png" alt="Lunamar Bags Logo" class="logo" />
     <h1>Lunamar Bags</h1>
     <p>Catálogo de productos</p>
+    <a href="https://chat.whatsapp.com/HRqdgVHHkQI4mX08EzUAx1" class="boton" target="_blank">Únete al Grupo de WhatsApp</a>
   </header>
+
   <section class="catalogo" id="catalogo"></section>
+
   <footer>&copy; 2025 Lunamar Bags. C&C.</footer>
+
   <script>
     fetch('productos.json')
       .then(res => res.json())
@@ -36,7 +42,7 @@
               <p>${p.precioMayoreo} MXN (Mayoreo)</p>
               <p>${p.precioMenudeo} MXN (Menudeo)</p>
               <p>${p.descripcion}</p>
-              <a class="boton" href="https://wa.me/${p.whatsapp}">Ordenar por WhatsApp</a>
+              <a class="boton" href="https://wa.me/${p.whatsapp}" target="_blank">Ordenar por WhatsApp</a>
             </div>
           `;
         });
