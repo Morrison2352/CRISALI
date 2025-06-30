@@ -86,8 +86,6 @@
 
   let productos = [];
 
-  const URL_PRODUCTOS_JSON = "https://morrison2352.github.io/lunamar-landing/productos.json";
-
   function renderProductos() {
     productosList.innerHTML = '';
     productos.forEach((p, i) => {
@@ -124,19 +122,6 @@
     });
   });
 
-  function cargarProductos() {
-    fetch(URL_PRODUCTOS_JSON)
-      .then(res => res.json())
-      .then(data => {
-        productos = data.map(p => ({ ...p, inventario: p.inventario || 0 }));
-        renderProductos();
-      })
-      .catch(() => {
-        productos = [];
-        renderProductos();
-      });
-  }
-
   loginBtn.addEventListener('click', () => {
     if (passwordInput.value === PASSWORD) {
       loginDiv.classList.add('hidden');
@@ -146,6 +131,10 @@
       loginError.style.display = 'block';
     }
   });
+
+  function saveProductos() {
+    exportarJSON();
+  }
 
   productForm.addEventListener('submit', e => {
     e.preventDefault();
@@ -166,6 +155,7 @@
     }
     resetForm();
     renderProductos();
+    saveProductos();
   });
 
   function resetForm() {
@@ -188,6 +178,7 @@
       if (confirm(`¿Eliminar producto "${productos[i].nombre}"?`)) {
         productos.splice(i, 1);
         renderProductos();
+        saveProductos();
       }
     }
   });
@@ -203,6 +194,19 @@
     document.getElementById('inventario').value = p.inventario || 0;
     cancelEditBtn.classList.remove('hidden');
     document.getElementById('formSection').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function cargarProductos() {
+    fetch("https://morrison2352.github.io/lunamar-landing/productos.json")
+      .then(res => res.json())
+      .then(data => {
+        productos = data.map(p => ({ ...p, inventario: p.inventario || 0 }));
+        renderProductos();
+      })
+      .catch(() => {
+        productos = [];
+        renderProductos();
+      });
   }
 })();
 </script>
