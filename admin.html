@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Panel de Administración - Lunamar</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background: #fffbe7; }
@@ -13,25 +13,35 @@
 </head>
 <body>
   <h1>Agregar nuevo producto</h1>
-  <label>Nombre: <input id="nombre" /></label>
-  <label>Precio Mayoreo: <input id="mayoreo" /></label>
-  <label>Precio Menudeo: <input id="menudeo" /></label>
+  <label>Nombre: <input id="nombre" type="text" /></label>
+  <label>Precio Mayoreo (sin símbolo $): <input id="mayoreo" type="number" min="0" step="0.01" /></label>
+  <label>Precio Menudeo (sin símbolo $): <input id="menudeo" type="number" min="0" step="0.01" /></label>
   <label>Descripción: <textarea id="descripcion"></textarea></label>
-  <label>Imagen URL: <input id="imagen" /></label>
-  <label>Número de WhatsApp (521xxxxxxxxxx): <input id="whatsapp" /></label>
+  <label>Imagen URL: <input id="imagen" type="url" /></label>
+  <label>Número de WhatsApp (521xxxxxxxxxx): <input id="whatsapp" type="tel" pattern="521[0-9]{10}" placeholder="Ej: 5213481070708" /></label>
   <button onclick="generar()">Generar JSON</button>
   <pre id="salida"></pre>
 
   <script>
     function generar() {
+      // Validar que precios sean números válidos
+      const mayoreo = parseFloat(document.getElementById('mayoreo').value);
+      const menudeo = parseFloat(document.getElementById('menudeo').value);
+
+      if (isNaN(mayoreo) || isNaN(menudeo)) {
+        alert('Por favor, ingresa precios válidos sin el símbolo $.');
+        return;
+      }
+
       const producto = {
-        nombre: document.getElementById('nombre').value,
-        precioMayoreo: document.getElementById('mayoreo').value,
-        precioMenudeo: document.getElementById('menudeo').value,
-        descripcion: document.getElementById('descripcion').value,
-        imagen: document.getElementById('imagen').value,
-        whatsapp: document.getElementById('whatsapp').value
+        nombre: document.getElementById('nombre').value.trim(),
+        precioMayoreo: mayoreo,
+        precioMenudeo: menudeo,
+        descripcion: document.getElementById('descripcion').value.trim(),
+        imagen: document.getElementById('imagen').value.trim(),
+        whatsapp: document.getElementById('whatsapp').value.trim()
       };
+
       document.getElementById('salida').textContent = JSON.stringify(producto, null, 2) + ',';
     }
   </script>
