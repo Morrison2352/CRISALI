@@ -11,8 +11,6 @@
     label { display: block; margin: 15px 0 5px; }
     input, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
     button { background: #6a4e77; color: white; border: none; padding: 10px 20px; margin-top: 15px; cursor: pointer; border-radius: 5px; }
-    button#cancelEdit { background:#999; margin-left: 10px; }
-    button#guardarCambiosBtn { background:#4a3571; margin-top: 10px; }
     .producto { background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .producto img { max-width: 100px; border-radius: 8px; display: block; margin-bottom: 10px; }
     .producto-buttons button { margin-right: 10px; }
@@ -54,13 +52,12 @@
       <input type="url" id="imagen" required />
     </label>
     <button type="submit">Guardar Producto</button>
-    <button type="button" id="cancelEdit" class="hidden">Cancelar Edición</button>
+    <button type="button" id="cancelEdit" class="hidden" style="background:#999;">Cancelar Edición</button>
   </form>
 
   <h2>Productos Actuales</h2>
   <div id="contadorProductos">Total de productos: 0</div>
   <div id="productosList"></div>
-  <button id="guardarCambiosBtn">Guardar Todos los Cambios</button>
 
   <h2>JSON Exportado</h2>
   <button id="copiarJsonBtn">Copiar JSON</button>
@@ -70,8 +67,6 @@
 <script>
 (function(){
   const PASSWORD = "lunamar2025";
-  const STORAGE_KEY = "lunamar_productos";
-
   const loginDiv = document.getElementById('login');
   const adminDiv = document.getElementById('adminPanel');
   const loginBtn = document.getElementById('loginBtn');
@@ -85,7 +80,6 @@
   const cancelEditBtn = document.getElementById('cancelEdit');
   const contadorProductos = document.getElementById('contadorProductos');
   const copiarJsonBtn = document.getElementById('copiarJsonBtn');
-  const guardarCambiosBtn = document.getElementById('guardarCambiosBtn');
 
   let productos = [];
 
@@ -98,8 +92,8 @@
       div.innerHTML = `
         <img src="${p.imagen}" alt="${p.nombre}" />
         <h3>${p.nombre}</h3>
-        <p><strong>Mayoreo:</strong> $${p.precioMayoreo.toFixed(2)} MXN</p>
-        <p><strong>Menudeo:</strong> $${p.precioMenudeo.toFixed(2)} MXN</p>
+        <p><strong>Mayoreo:</strong> $${p.precioMayoreo} MXN</p>
+        <p><strong>Menudeo:</strong> $${p.precioMenudeo} MXN</p>
         <p>${p.descripcion}</p>
         <div class="producto-buttons">
           <button data-index="${i}" class="editarBtn">Editar</button>
@@ -114,24 +108,6 @@
 
   function exportarJSON() {
     exportJson.textContent = JSON.stringify(productos, null, 2);
-  }
-
-  function guardarEnLocalStorage() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(productos));
-  }
-
-  function cargarDeLocalStorage() {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      try {
-        productos = JSON.parse(data);
-        return true;
-      } catch {
-        productos = [];
-        return false;
-      }
-    }
-    return false;
   }
 
   copiarJsonBtn.addEventListener('click', () => {
@@ -153,11 +129,9 @@
     }
   });
 
-  guardarCambiosBtn.addEventListener('click', () => {
-    guardarEnLocalStorage();
+  function saveProductos() {
     exportarJSON();
-    alert("Todos los cambios han sido guardados correctamente.");
-  });
+  }
 
   productForm.addEventListener('submit', e => {
     e.preventDefault();
@@ -177,7 +151,7 @@
     }
     resetForm();
     renderProductos();
-    guardarEnLocalStorage();
+    saveProductos();
 
     setTimeout(() => {
       const target = document.querySelector(`[data-producto-id='producto-${index === -1 ? productos.length - 1 : index}']`);
@@ -207,7 +181,7 @@
       if (confirm(`¿Eliminar producto "${productos[i].nombre}"?`)) {
         productos.splice(i, 1);
         renderProductos();
-        guardarEnLocalStorage();
+        saveProductos();
       }
     }
   });
@@ -225,23 +199,16 @@
   }
 
   function cargarProductos() {
-    // Primero intentamos cargar de localStorage para persistencia
-    if (!cargarDeLocalStorage()) {
-      // Si no hay datos en localStorage, cargamos desde JSON remoto
-      fetch("https://morrison2352.github.io/lunamar-landing/productos.json")
-        .then(res => res.json())
-        .then(data => {
-          productos = data;
-          renderProductos();
-          guardarEnLocalStorage(); // Guardar la carga inicial en localStorage
-        })
-        .catch(() => {
-          productos = [];
-          renderProductos();
-        });
-    } else {
-      renderProductos();
-    }
+    fetch("https://morrison2352.github.io/lunamar-landing/productos.json")
+      .then(res => res.json())
+      .then(data => {
+        productos = data;
+        renderProductos();
+      })
+      .catch(() => {
+        productos = [];
+        renderProductos();
+      });
   }
 })();
 </script>
