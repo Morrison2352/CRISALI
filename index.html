@@ -11,14 +11,12 @@
     header, footer { background: #f0d7e7; text-align: center; padding: 20px; }
     header h1 { margin: 10px 0 0; color: #6a4e77; }
     .logo { max-width: 180px; margin-bottom: 10px; }
-
     .catalogo {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 20px;
       padding: 20px;
     }
-
     .producto {
       background: white;
       border-radius: 12px;
@@ -26,18 +24,15 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       text-align: center;
     }
-
     .producto img {
       max-width: 100%;
       border-radius: 8px;
       height: auto;
     }
-
     .producto h3 {
       color: #6a4e77;
       margin: 10px 0;
     }
-
     .boton {
       background: #6a4e77;
       color: white;
@@ -49,63 +44,6 @@
       cursor: pointer;
       border: none;
     }
-
-    #carrito {
-      padding: 20px;
-      background: #fff3f6;
-      border-top: 2px solid #e0a5c0;
-      position: fixed;
-      top: 80px;
-      right: 0;
-      width: 100%;
-      max-width: 350px;
-      height: auto;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      display: none;
-      z-index: 1000;
-    }
-
-    #carrito h2 { color: #6a4e77; }
-    #carrito ul { list-style: none; padding: 0; }
-    #carrito li {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    #carrito li > div { flex-grow: 1; }
-    input[type='number'], input[type='text'] {
-      width: 100%;
-      padding: 5px;
-      margin: 5px 0;
-    }
-
-    .btn-eliminar {
-      background: #c0392b;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-    }
-
-    #verCarritoBtn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #6a4e77;
-      color: white;
-      padding: 10px 15px;
-      border-radius: 50px;
-      border: none;
-      cursor: pointer;
-      z-index: 1500;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-
     #modalCantidad {
       display: none;
       position: fixed;
@@ -118,7 +56,6 @@
       align-items: center;
       z-index: 2000;
     }
-
     #modalContenido {
       background: white;
       padding: 20px;
@@ -127,34 +64,18 @@
       max-width: 300px;
       width: 90%;
     }
-
     @media (max-width: 600px) {
-      #carrito {
-        width: 100%;
-        left: 0;
-        top: auto;
-        bottom: 0;
-        height: auto;
-        max-height: 60vh;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-      }
-      .catalogo {
-        padding: 10px;
-      }
+      .catalogo { padding: 10px; }
     }
   </style>
 </head>
 <body>
-
 <header>
   <img src="https://raw.githubusercontent.com/Morrison2352/lunamar-landing/refs/heads/main/LUNAMAR-BAGS.png" alt="Lunamar Bags Logo" class="logo" />
   <h1>Lunamar Bags</h1>
   <p>Catálogo de productos</p>
 </header>
-
 <section class="catalogo" id="catalogo"></section>
-
 <div id="modalCantidad" onclick="cerrarModalDesdeFondo(event)">
   <div id="modalContenido" onclick="event.stopPropagation()">
     <h3>¿Cuántas piezas deseas?</h3>
@@ -163,14 +84,24 @@
     <button class="boton" onclick="confirmarCantidad()">Aceptar</button>
   </div>
 </div>
-
 <footer>&copy; 2025 Lunamar Bags. C&C.</footer>
-
 <script>
 function cerrarModalDesdeFondo(event) {
   if (event.target.id === 'modalCantidad') {
     document.getElementById('modalCantidad').style.display = 'none';
   }
+}
+
+function mostrarModal(nombre, precioMayoreo, precioMenudeo) {
+  document.getElementById('modalCantidad').style.display = 'flex';
+  console.log("Producto seleccionado:", nombre, precioMayoreo, precioMenudeo);
+  // Aquí puedes almacenar temporalmente el producto seleccionado si lo necesitas más adelante
+}
+
+function confirmarCantidad() {
+  const cantidad = document.getElementById('cantidadSeleccionada').value;
+  console.log("Cantidad confirmada:", cantidad);
+  document.getElementById('modalCantidad').style.display = 'none';
 }
 
 fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
@@ -200,6 +131,5 @@ fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
     console.error('Error al cargar productos.json:', error);
   });
 </script>
-
 </body>
 </html>
