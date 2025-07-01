@@ -9,27 +9,24 @@
   },
   {
     "nombre": "BOLSA DE MANO",
-    "precioMayoreo": "200",
-    "precioMenudeo": "100",
+    "precioMayoreo": 100,
+    "precioMenudeo": 200,
     "descripcion": "EXCELENTE PARA VIAJES",
-    "imagen": "https://acdn-us.mitiendanube.com/stores/002/401/150/products/6878-virginia-azul-marino-1-09036bc05622ced54d17482083375820-1024-1024.jpg",
-    "whatsapp": "5213481070708"
+    "imagen": "https://acdn-us.mitiendanube.com/stores/002/401/150/products/6878-virginia-azul-marino-1-09036bc05622ced54d17482083375820-1024-1024.jpg"
   },
   {
     "nombre": "BOLSA X22",
-    "precioMayoreo": 300,
-    "precioMenudeo": 200,
+    "precioMayoreo": 200,
+    "precioMenudeo": 300,
     "descripcion": "BOLSA IDEAL PARA VIAJES",
-    "imagen": "https://www.fana.mx/wp-content/uploads/2024/02/3244-VINO-NEGRO-1024x1024.jpg.webp",
-    "whatsapp": "5213481070708"
+    "imagen": "https://www.fana.mx/wp-content/uploads/2024/02/3244-VINO-NEGRO-1024x1024.jpg.webp"
   },
   {
     "nombre": "BOLSA CHANEL",
-    "precioMayoreo": 500,
-    "precioMenudeo": 275,
+    "precioMayoreo": 275,
+    "precioMenudeo": 500,
     "descripcion": "LA MERJOR MARCA AL MEJOR PRECIO",
-    "imagen": "https://www.elpalaciodehierro.com/dw/image/v2/BDKB_PRD/on/demandware.static/-/Sites-palacio-master-catalog/default/dw467c4814/images/41021444/large/41021444_x1.jpg?sw=2200&sh=2500",
-    "whatsapp": "5213481070708"
+    "imagen": "https://www.elpalaciodehierro.com/dw/image/v2/BDKB_PRD/on/demandware.static/-/Sites-palacio-master-catalog/default/dw467c4814/images/41021444/large/41021444_x1.jpg?sw=2200&sh=2500"
   },
   {
     "nombre": "BOLSA X32",
@@ -41,7 +38,7 @@
   {
     "nombre": "BOLSA FERREL",
     "precioMayoreo": 550,
-    "precioMenudeo": 800,
+    "precioMenudeo": 850,
     "descripcion": "PONTE A LA MODA CON ESTA BOLSA",
     "imagen": "https://cdn-images.farfetch-contents.com/19/45/46/40/19454640_43296168_1000.jpg"
   }
