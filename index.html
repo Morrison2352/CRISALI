@@ -122,6 +122,24 @@
       z-index: 1500;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
+    #modalCantidad {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    #modalContenido {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 300px;
+      width: 90%;
+    }
     #formDatos {
       background: #fff3f6;
       padding: 15px;
@@ -181,81 +199,78 @@
     <h3>Datos para el pedido</h3>
     <label for="nombreCompleto">Nombre Completo</label>
     <input type="text" id="nombreCompleto" placeholder="Tu nombre completo" required />
-    
+
     <label for="domicilio">Domicilio</label>
     <input type="text" id="domicilio" placeholder="Tu domicilio" required />
-    
+
     <label for="ciudad">Ciudad</label>
     <input type="text" id="ciudad" placeholder="Ciudad" required />
-    
+
     <label for="codigoPostal">Código Postal</label>
     <input type="text" id="codigoPostal" placeholder="Código Postal" required />
-    
+
     <label for="estado">Estado</label>
     <input type="text" id="estado" placeholder="Estado" required />
-    
+
     <button id="enviarPedido" onclick="enviarPedidoWhatsApp()">Enviar pedido por WhatsApp</button>
   </div>
 </section>
 
+<!-- Modal para seleccionar cantidad -->
+<div id="modalCantidad" onclick="cerrarModalDesdeFondo(event)">
+  <div id="modalContenido" onclick="event.stopPropagation()">
+    <h3>¿Cuántas piezas deseas?</h3>
+    <input type="number" id="cantidadSeleccionada" min="1" value="1" />
+    <br><br>
+    <button class="boton" onclick="confirmarCantidad()">Aceptar</button>
+  </div>
+</div>
+
 <script>
+  let productoTemporal = null;
+  let carrito = [];
+
   const catalogoEl = document.getElementById('catalogo');
   const carritoEl = document.getElementById('carrito');
   const listaProductosEl = document.getElementById('listaProductos');
-  const verCarritoBtn = document.getElementById('verCarritoBtn');
 
-  let carrito = [];
-
-  // Función para mostrar/ocultar carrito
   function toggleCarrito() {
-    if (carritoEl.style.display === 'block') {
-      carritoEl.style.display = 'none';
-    } else {
-      carritoEl.style.display = 'block';
+    carritoEl.style.display = carritoEl.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function cerrarModalDesdeFondo(event) {
+    if(event.target.id === 'modalCantidad') {
+      document.getElementById('modalCantidad').style.display = 'none';
     }
   }
 
-  // Cargar productos desde JSON
-  fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
-    .then(res => res.json())
-    .then(data => {
-      if (!data || data.length === 0) {
-        catalogoEl.innerHTML = '<p style="text-align:center;">No hay productos disponibles.</p>';
-        return;
-      }
-      data.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'producto';
-        div.innerHTML = `
-          <img src="${p.imagen}" alt="${p.nombre}" />
-          <h3>${p.nombre}</h3>
-          <p><strong>Mayoreo:</strong> $${p.precioMayoreo} MXN</p>
-          <p><strong>Menudeo:</strong> $${p.precioMenudeo} MXN</p>
-          <p>${p.descripcion}</p>
-          <button class="boton" onclick='agregarAlCarrito(${JSON.stringify(p).replace(/'/g, "&apos;")})'>Añadir al carrito</button>
-        `;
-        catalogoEl.appendChild(div);
-      });
-    })
-    .catch(err => {
-      catalogoEl.innerHTML = '<p style="text-align:center; color:red;">Error al cargar productos.</p>';
-      console.error(err);
-    });
+  function mostrarModal(nombre, precioMayoreo, precioMenudeo) {
+    productoTemporal = { nombre, precioMayoreo, precioMenudeo };
+    document.getElementById('cantidadSeleccionada').value = 1;
+    document.getElementById('modalCantidad').style.display = 'flex';
+  }
 
-  // Añadir producto al carrito
-  function agregarAlCarrito(producto) {
-    // Revisar si ya existe producto en carrito
-    const index = carrito.findIndex(item => item.nombre === producto.nombre);
-    if (index >= 0) {
-      carrito[index].cantidad++;
+  function confirmarCantidad() {
+    const cantidad = parseInt(document.getElementById('cantidadSeleccionada').value);
+    if(isNaN(cantidad) || cantidad < 1) {
+      alert("Por favor, ingresa una cantidad válida.");
+      return;
+    }
+    agregarAlCarrito(productoTemporal, cantidad);
+    document.getElementById('modalCantidad').style.display = 'none';
+  }
+
+  function agregarAlCarrito(producto, cantidad) {
+    const index = carrito.findIndex(p => p.nombre === producto.nombre);
+    if(index !== -1) {
+      carrito[index].cantidad += cantidad;
     } else {
-      carrito.push({...producto, cantidad: 1});
+      carrito.push({...producto, cantidad});
     }
     actualizarCarritoUI();
     carritoEl.style.display = 'block'; // Mostrar carrito automáticamente
   }
 
-  // Actualizar UI carrito
   function actualizarCarritoUI() {
     listaProductosEl.innerHTML = '';
     if(carrito.length === 0) {
@@ -275,60 +290,76 @@
     });
   }
 
-  // Cambiar cantidad de producto
   function cambiarCantidad(index, cantidad) {
     const cant = parseInt(cantidad);
-    if (isNaN(cant) || cant < 1) return;
+    if(isNaN(cant) || cant < 1) return;
     carrito[index].cantidad = cant;
     actualizarCarritoUI();
   }
 
-  // Eliminar producto
   function eliminarProducto(index) {
     carrito.splice(index, 1);
     actualizarCarritoUI();
   }
 
-  // Enviar pedido por WhatsApp
   function enviarPedidoWhatsApp() {
     if(carrito.length === 0) {
-      alert('Tu carrito está vacío.');
+      alert("Tu carrito está vacío.");
       return;
     }
 
-    // Leer datos del formulario
     const nombreCompleto = document.getElementById('nombreCompleto').value.trim();
     const domicilio = document.getElementById('domicilio').value.trim();
     const ciudad = document.getElementById('ciudad').value.trim();
     const codigoPostal = document.getElementById('codigoPostal').value.trim();
     const estado = document.getElementById('estado').value.trim();
 
-    // Validar que todos los campos estén completos
     if(!nombreCompleto || !domicilio || !ciudad || !codigoPostal || !estado) {
-      alert('Por favor, completa todos los datos para el pedido.');
+      alert("Por favor, completa todos los datos para el pedido.");
       return;
     }
 
-    // Construir mensaje
     let mensaje = `Hola, soy *${nombreCompleto}* y quiero realizar el siguiente pedido:\n\n`;
     mensaje += `Domicilio: ${domicilio}\nCiudad: ${ciudad}\nCódigo Postal: ${codigoPostal}\nEstado: ${estado}\n\n`;
-    mensaje += 'Productos:\n';
+    mensaje += "Productos:\n";
 
     carrito.forEach(item => {
       mensaje += `- ${item.nombre} x${item.cantidad}\n`;
     });
 
-    // Codificar mensaje para URL
     const mensajeCodificado = encodeURIComponent(mensaje);
+    const numeroWhatsApp = '5212345678901'; // Cambia este número
 
-    // Número de WhatsApp (sin signos ni espacios, con código país, por ejemplo México +52)
-    const numeroWhatsApp = '5212345678901'; // Cambia este número por el tuyo
-
-    // Abrir WhatsApp
     window.open(`https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`, '_blank');
   }
 
-  // Inicializa carrito vacío al cargar la página
+  // Cargar productos JSON y renderizar catálogo
+  fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
+    .then(res => res.json())
+    .then(data => {
+      if(!data || data.length === 0) {
+        catalogoEl.innerHTML = '<p style="text-align:center;">No hay productos disponibles.</p>';
+        return;
+      }
+      data.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'producto';
+        div.innerHTML = `
+          <img src="${p.imagen}" alt="${p.nombre}" />
+          <h3>${p.nombre}</h3>
+          <p><strong>Mayoreo:</strong> $${p.precioMayoreo} MXN</p>
+          <p><strong>Menudeo:</strong> $${p.precioMenudeo} MXN</p>
+          <p>${p.descripcion}</p>
+          <button class="boton" onclick="mostrarModal('${p.nombre}', ${p.precioMayoreo}, ${p.precioMenudeo})">Añadir al carrito</button>
+        `;
+        catalogoEl.appendChild(div);
+      });
+    })
+    .catch(error => {
+      catalogoEl.innerHTML = '<p style="text-align:center; color:red;">Error al cargar productos.</p>';
+      console.error(error);
+    });
+
   actualizarCarritoUI();
 </script>
 
