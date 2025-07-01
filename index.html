@@ -119,6 +119,17 @@
       font-weight: 600;
       font-size: 16px;
     }
+    #carritoCantidad {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #e74c3c;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 50%;
+    }
     #datosCliente {
       margin-top: 20px;
     }
@@ -174,7 +185,10 @@
   <p>Catálogo de productos</p>
 </header>
 <section class="catalogo" id="catalogo"></section>
-<button id="verCarritoBtn" onclick="toggleCarrito(event)">Ver carrito</button>
+<button id="verCarritoBtn" onclick="toggleCarrito(event)">
+  Ver carrito
+  <span id="carritoCantidad" style="display:none;">0</span>
+</button>
 <aside id="carrito">
   <h2>Tu carrito</h2>
   <ul id="listaProductos"></ul>
@@ -231,16 +245,22 @@ function actualizarCarrito() {
   const lista = document.getElementById('listaProductos');
   lista.innerHTML = '';
   let totalGeneral = 0;
+  let totalItems = 0;
+  const totalCantidad = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+  const usarMayoreo = totalCantidad >= 3;
+
   carrito.forEach((item, index) => {
-    const subtotal = item.precioMenudeo * item.cantidad;
+    const precioUnitario = usarMayoreo ? item.precioMayoreo : item.precioMenudeo;
+    const subtotal = precioUnitario * item.cantidad;
     totalGeneral += subtotal;
+    totalItems += item.cantidad;
     const li = document.createElement('li');
     li.innerHTML = `
       <div>
         <img src="${item.imagen}" alt="${item.nombre}" />
         <div class="infoProducto">
           <strong>${item.nombre}</strong><br/>
-          Precio unitario: $${item.precioMenudeo.toFixed(2)} MXN<br/>
+          Precio unitario: $${precioUnitario.toFixed(2)} MXN<br/>
           Cantidad: <input type="number" min="1" value="${item.cantidad}" onchange="cambiarCantidad(${index}, this.value)" /><br/>
           Subtotal: $${subtotal.toFixed(2)} MXN
         </div>
@@ -250,6 +270,13 @@ function actualizarCarrito() {
     lista.appendChild(li);
   });
   document.getElementById('totalGeneral').innerText = `Total: $${totalGeneral.toFixed(2)} MXN`;
+  const cantidadSpan = document.getElementById('carritoCantidad');
+  if (totalItems > 0) {
+    cantidadSpan.style.display = 'inline-block';
+    cantidadSpan.textContent = totalItems;
+  } else {
+    cantidadSpan.style.display = 'none';
+  }
 }
 
 function cambiarCantidad(index, nuevaCantidad) {
