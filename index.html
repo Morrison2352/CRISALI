@@ -6,8 +6,176 @@
   <title>Lunamar Bags | Catálogo</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
-    /* (Todo tu CSS permanece igual, no es necesario repetirlo aquí para esta corrección) */
-    /* Puedes mantener el CSS tal como lo tenías en tu código original */
+    * { box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background: #fdf6f9; margin: 0; padding: 0; color: #333; }
+    header, footer { background: #f0d7e7; text-align: center; padding: 20px; }
+    header h1 { margin: 10px 0 0; color: #6a4e77; }
+    .logo { max-width: 180px; margin-bottom: 10px; }
+    .catalogo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .producto {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .producto img {
+      max-width: 100%;
+      border-radius: 8px;
+      height: auto;
+    }
+    .producto h3 {
+      color: #6a4e77;
+      margin: 10px 0;
+    }
+    .boton {
+      background: #6a4e77;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 10px;
+      cursor: pointer;
+      border: none;
+    }
+    #carrito {
+      padding: 20px;
+      background: #fff3f6;
+      border-top: 2px solid #e0a5c0;
+      position: fixed;
+      top: 80px;
+      right: 0;
+      width: 100%;
+      max-width: 400px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1000;
+    }
+    #carrito h2 { color: #6a4e77; margin-top: 0; }
+    #carrito ul { list-style: none; padding: 0; margin: 0; }
+    #carrito li {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid #e0a5c0;
+      padding-bottom: 10px;
+    }
+    #carrito li > div {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #carrito li img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      flex-shrink: 0;
+      box-shadow: 0 0 5px rgba(106, 78, 119, 0.3);
+    }
+    #carrito li div.infoProducto {
+      flex-direction: column;
+      text-align: left;
+    }
+    input[type='number'], input[type='text'] {
+      width: 100%;
+      padding: 5px;
+      margin: 5px 0;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .btn-eliminar {
+      background: #c0392b;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      height: fit-content;
+    }
+    #verCarritoBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #6a4e77;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      z-index: 1500;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      font-weight: 600;
+      font-size: 16px;
+    }
+    #carritoCantidad {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #e74c3c;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 50%;
+    }
+    #datosCliente {
+      margin-top: 20px;
+    }
+    #datosCliente label {
+      display: block;
+      font-weight: 600;
+      margin-top: 10px;
+      color: #6a4e77;
+    }
+    #datosCliente input {
+      margin-top: 5px;
+    }
+    #totalGeneral {
+      margin-top: 15px;
+      font-weight: 700;
+      font-size: 1.1em;
+      color: #6a4e77;
+      text-align: right;
+    }
+    #btnEnviarWhatsApp {
+      margin-top: 20px;
+      width: 100%;
+      background: #25D366;
+      border: none;
+      color: white;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 3px 7px rgba(0,0,0,0.15);
+    }
+    @media (max-width: 600px) {
+      #carrito {
+        width: 100%;
+        left: 0;
+        top: auto;
+        bottom: 0;
+        max-height: 60vh;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+      }
+      .catalogo {
+        padding: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -16,32 +184,30 @@
   <h1>Lunamar Bags</h1>
   <p>Catálogo de productos</p>
 </header>
-<main>
-  <section class="catalogo" id="catalogo"></section>
-  <aside id="carrito" aria-label="Carrito de compras">
-    <h2>Tu carrito</h2>
-    <ul id="listaProductos"></ul>
-    <div id="datosCliente">
-      <label for="nombreCompleto">Nombre Completo:</label>
-      <input type="text" id="nombreCompleto" placeholder="Tu nombre completo" autocomplete="name" />
-      <label for="domicilio">Domicilio:</label>
-      <input type="text" id="domicilio" placeholder="Calle, número, etc." autocomplete="street-address" />
-      <label for="ciudad">Ciudad:</label>
-      <input type="text" id="ciudad" placeholder="Ciudad" autocomplete="address-level2" />
-      <label for="codigoPostal">Código Postal:</label>
-      <input type="text" id="codigoPostal" placeholder="Código postal" autocomplete="postal-code" />
-      <label for="estado">Estado:</label>
-      <input type="text" id="estado" placeholder="Estado" autocomplete="address-level1" />
-    </div>
-    <div id="totalGeneral">Total: $0.00 MXN</div>
-    <button id="btnEnviarWhatsApp" aria-label="Enviar pedido por WhatsApp">Enviar pedido por WhatsApp</button>
-  </aside>
-</main>
-<footer>&copy; 2025 Lunamar Bags. C&amp;C.</footer>
-<button id="verCarritoBtn" aria-label="Mostrar u ocultar carrito">
+<section class="catalogo" id="catalogo"></section>
+<button id="verCarritoBtn" onclick="toggleCarrito(event)">
   Ver carrito
-  <span id="carritoCantidad" aria-live="polite" style="display:none;">0</span>
+  <span id="carritoCantidad" style="display:none;">0</span>
 </button>
+<aside id="carrito">
+  <h2>Tu carrito</h2>
+  <ul id="listaProductos"></ul>
+  <div id="datosCliente">
+    <label for="nombreCompleto">Nombre Completo:</label>
+    <input type="text" id="nombreCompleto" placeholder="Tu nombre completo" />
+    <label for="domicilio">Domicilio:</label>
+    <input type="text" id="domicilio" placeholder="Calle, número, etc." />
+    <label for="ciudad">Ciudad:</label>
+    <input type="text" id="ciudad" placeholder="Ciudad" />
+    <label for="codigoPostal">Código Postal:</label>
+    <input type="text" id="codigoPostal" placeholder="Código postal" />
+    <label for="estado">Estado:</label>
+    <input type="text" id="estado" placeholder="Estado" />
+  </div>
+  <div id="totalGeneral">Total: $0.00 MXN</div>
+  <button id="btnEnviarWhatsApp">Enviar pedido por WhatsApp</button>
+</aside>
+<footer>&copy; 2025 Lunamar Bags. C&C.</footer>
 <script>
 let carrito = [];
 let whatsappToggle = true; // Para alternar entre los dos números
@@ -51,9 +217,6 @@ function toggleCarrito(event) {
   const carritoDiv = document.getElementById('carrito');
   carritoDiv.style.display = carritoDiv.style.display === 'block' ? 'none' : 'block';
 }
-
-// ✅ CORRECCIÓN: conectar botón con función toggleCarrito
-document.getElementById('verCarritoBtn').addEventListener('click', toggleCarrito);
 
 document.addEventListener('click', function (e) {
   const carritoDiv = document.getElementById('carrito');
@@ -99,11 +262,11 @@ function actualizarCarrito() {
         <div class="infoProducto">
           <strong>${item.nombre}</strong><br/>
           Precio unitario: $${precioUnitario.toFixed(2)} MXN<br/>
-          Cantidad: <input type="number" min="1" value="${item.cantidad}" onchange="cambiarCantidad(${index}, this.value)" aria-label="Cantidad de ${item.nombre}" /><br/>
+          Cantidad: <input type="number" min="1" value="${item.cantidad}" onchange="cambiarCantidad(${index}, this.value)" /><br/>
           Subtotal: $${subtotal.toFixed(2)} MXN
         </div>
       </div>
-      <button class="btn-eliminar" onclick="eliminarProducto(${index})" aria-label="Eliminar ${item.nombre} del carrito">Eliminar</button>
+      <button class="btn-eliminar" onclick="eliminarProducto(${index})">Eliminar</button>
     `;
     lista.appendChild(li);
   });
@@ -130,6 +293,7 @@ function eliminarProducto(index) {
   actualizarCarrito();
 }
 
+// Función para enviar pedido por WhatsApp alternando números
 document.getElementById('btnEnviarWhatsApp').addEventListener('click', () => {
   if (carrito.length === 0) {
     alert('El carrito está vacío.');
@@ -164,6 +328,7 @@ document.getElementById('btnEnviarWhatsApp').addEventListener('click', () => {
   whatsappToggle = !whatsappToggle;
 
   const urlWhatsapp = `https://wa.me/52${numero}?text=${encodeURIComponent(mensaje)}`;
+
   window.open(urlWhatsapp, '_blank');
 });
 
