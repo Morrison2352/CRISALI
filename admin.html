@@ -12,13 +12,13 @@
     input, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
     button { background: #6a4e77; color: white; border: none; padding: 10px 20px; margin-top: 15px; cursor: pointer; border-radius: 5px; }
     button#cancelEdit { background:#999; margin-left: 10px; }
+    button#guardarCambiosBtn { background:#4a3571; margin-top: 10px; }
     .producto { background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .producto img { max-width: 100px; border-radius: 8px; display: block; margin-bottom: 10px; }
     .producto-buttons button { margin-right: 10px; }
     #productosList { margin-top: 20px; }
     #exportJson { white-space: pre-wrap; background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 20px; font-family: monospace; max-height: 300px; overflow-y: auto; }
     #contadorProductos { font-weight: bold; text-align: right; margin-top: -10px; color: #333; }
-    #guardarCambiosBtn { background:#4a3571; margin-top: 10px; }
     .hidden { display: none; }
   </style>
 </head>
@@ -70,6 +70,8 @@
 <script>
 (function(){
   const PASSWORD = "lunamar2025";
+  const STORAGE_KEY = "lunamar_productos";
+
   const loginDiv = document.getElementById('login');
   const adminDiv = document.getElementById('adminPanel');
   const loginBtn = document.getElementById('loginBtn');
@@ -114,6 +116,24 @@
     exportJson.textContent = JSON.stringify(productos, null, 2);
   }
 
+  function guardarEnLocalStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(productos));
+  }
+
+  function cargarDeLocalStorage() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+      try {
+        productos = JSON.parse(data);
+        return true;
+      } catch {
+        productos = [];
+        return false;
+      }
+    }
+    return false;
+  }
+
   copiarJsonBtn.addEventListener('click', () => {
     const jsonText = exportJson.textContent;
     navigator.clipboard.writeText(jsonText).then(() => {
@@ -133,13 +153,9 @@
     }
   });
 
-  function saveProductos() {
-    exportarJSON();
-  }
-
-  // Nuevo botón: Guardar todos los cambios
   guardarCambiosBtn.addEventListener('click', () => {
-    saveProductos();
+    guardarEnLocalStorage();
+    exportarJSON();
     alert("Todos los cambios han sido guardados correctamente.");
   });
 
@@ -161,7 +177,7 @@
     }
     resetForm();
     renderProductos();
-    saveProductos();
+    guardarEnLocalStorage();
 
     setTimeout(() => {
       const target = document.querySelector(`[data-producto-id='producto-${index === -1 ? productos.length - 1 : index}']`);
@@ -191,7 +207,7 @@
       if (confirm(`¿Eliminar producto "${productos[i].nombre}"?`)) {
         productos.splice(i, 1);
         renderProductos();
-        saveProductos();
+        guardarEnLocalStorage();
       }
     }
   });
@@ -209,16 +225,23 @@
   }
 
   function cargarProductos() {
-    fetch("https://morrison2352.github.io/lunamar-landing/productos.json")
-      .then(res => res.json())
-      .then(data => {
-        productos = data;
-        renderProductos();
-      })
-      .catch(() => {
-        productos = [];
-        renderProductos();
-      });
+    // Primero intentamos cargar de localStorage para persistencia
+    if (!cargarDeLocalStorage()) {
+      // Si no hay datos en localStorage, cargamos desde JSON remoto
+      fetch("https://morrison2352.github.io/lunamar-landing/productos.json")
+        .then(res => res.json())
+        .then(data => {
+          productos = data;
+          renderProductos();
+          guardarEnLocalStorage(); // Guardar la carga inicial en localStorage
+        })
+        .catch(() => {
+          productos = [];
+          renderProductos();
+        });
+    } else {
+      renderProductos();
+    }
   }
 })();
 </script>
