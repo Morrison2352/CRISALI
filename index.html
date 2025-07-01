@@ -52,7 +52,7 @@
       top: 80px;
       right: 0;
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       max-height: 80vh;
       overflow-y: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
@@ -62,13 +62,32 @@
     #carrito h2 { color: #6a4e77; margin-top: 0; }
     #carrito ul { list-style: none; padding: 0; margin: 0; }
     #carrito li {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      border-bottom: 1px solid #e0a5c0;
+      padding-bottom: 10px;
     }
-    #carrito li > div { flex-grow: 1; }
+    #carrito li > div {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #carrito li img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      flex-shrink: 0;
+      box-shadow: 0 0 5px rgba(106, 78, 119, 0.3);
+    }
+    #carrito li div.infoProducto {
+      flex-direction: column;
+      text-align: left;
+    }
     input[type='number'], input[type='text'] {
       width: 100%;
       padding: 5px;
@@ -83,6 +102,7 @@
       border-radius: 6px;
       border: none;
       cursor: pointer;
+      height: fit-content;
     }
     #verCarritoBtn {
       position: fixed;
@@ -188,9 +208,17 @@
     carritoDiv.style.display = carritoDiv.style.display === 'block' ? 'none' : 'block';
   }
 
+  // Suma total de cantidades en carrito
+  function sumaCantidadTotal() {
+    return carrito.reduce((acc, item) => acc + item.cantidad, 0);
+  }
+
   function actualizarCarrito() {
     const lista = document.getElementById('listaProductos');
     lista.innerHTML = '';
+
+    const cantidadTotal = sumaCantidadTotal();
+    const usarMayoreo = cantidadTotal >= 3;
 
     let totalGeneral = 0;
 
@@ -198,7 +226,7 @@
       const precioMayoreo = Number(item.precioMayoreo);
       const precioMenudeo = Number(item.precioMenudeo);
       const cantidad = Number(item.cantidad);
-      const precioUnitario = cantidad >= 3 ? precioMayoreo : precioMenudeo;
+      const precioUnitario = usarMayoreo ? precioMayoreo : precioMenudeo;
       const subtotal = precioUnitario * cantidad;
       totalGeneral += subtotal;
 
@@ -206,11 +234,14 @@
 
       li.innerHTML = `
         <div>
-          <strong>${item.nombre}</strong><br/>
-          Precio unitario: $${precioUnitario.toFixed(2)} MXN<br/>
-          Cantidad: <input type="number" min="1" value="${cantidad}" onchange="cambiarCantidad(${index}, this.value)" />
-          <br/>
-          Subtotal: $${subtotal.toFixed(2)} MXN
+          <img src="${item.imagen}" alt="${item.nombre}" />
+          <div class="infoProducto">
+            <strong>${item.nombre}</strong><br/>
+            Precio unitario: $${precioUnitario.toFixed(2)} MXN<br/>
+            Cantidad: <input type="number" min="1" value="${cantidad}" onchange="cambiarCantidad(${index}, this.value)" />
+            <br/>
+            Subtotal: $${subtotal.toFixed(2)} MXN
+          </div>
         </div>
         <button class="btn-eliminar" onclick="eliminarProducto(${index})">Eliminar</button>
       `;
@@ -234,17 +265,17 @@
     actualizarCarrito();
   }
 
-  // Función para escapar comillas simples y dobles en nombres de productos
+  // Escapar comillas para el onclick
   function escaparTexto(texto) {
     return texto.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
   }
 
-  function agregarAlCarrito(nombre, precioMayoreo, precioMenudeo) {
+  function agregarAlCarrito(nombre, precioMayoreo, precioMenudeo, imagen) {
     const index = carrito.findIndex(p => p.nombre === nombre);
     if (index !== -1) {
       carrito[index].cantidad += 1;
     } else {
-      carrito.push({ nombre, precioMayoreo, precioMenudeo, cantidad: 1 });
+      carrito.push({ nombre, precioMayoreo, precioMenudeo, cantidad: 1, imagen });
     }
     actualizarCarrito();
     document.getElementById('carrito').style.display = 'block';
@@ -267,6 +298,9 @@
       return;
     }
 
+    const cantidadTotal = sumaCantidadTotal();
+    const usarMayoreo = cantidadTotal >= 3;
+
     let mensaje = `Hola, soy *${nombreCompleto}* y quiero realizar el siguiente pedido:%0A%0A`;
     mensaje += `Domicilio: ${domicilio}%0ACiudad: ${ciudad}%0ACódigo Postal: ${codigoPostal}%0AEstado: ${estado}%0A%0A`;
     mensaje += "Productos:%0A";
@@ -276,7 +310,7 @@
       const precioMayoreo = Number(item.precioMayoreo);
       const precioMenudeo = Number(item.precioMenudeo);
       const cantidad = Number(item.cantidad);
-      const precioUnitario = cantidad >= 3 ? precioMayoreo : precioMenudeo;
+      const precioUnitario = usarMayoreo ? precioMayoreo : precioMenudeo;
       const subtotal = precioUnitario * cantidad;
       totalGeneral += subtotal;
       mensaje += `- ${item.nombre} x${cantidad} = $${subtotal.toFixed(2)} MXN%0A`;
@@ -312,7 +346,7 @@
         const div = document.createElement('div');
         div.className = 'producto';
 
-        // Escapar nombre para evitar errores en onclick
+        // Escapar nombre para onclick
         const nombreEscapado = p.nombre.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
         div.innerHTML = `
@@ -321,7 +355,7 @@
           <p>$${Number(p.precioMayoreo).toFixed(2)} MXN (Mayoreo)</p>
           <p>$${Number(p.precioMenudeo).toFixed(2)} MXN (Menudeo)</p>
           <p>${p.descripcion}</p>
-          <button class="boton" onclick="agregarAlCarrito('${nombreEscapado}', ${Number(p.precioMayoreo)}, ${Number(p.precioMenudeo)})">Añadir al carrito</button>
+          <button class="boton" onclick="agregarAlCarrito('${nombreEscapado}', ${Number(p.precioMayoreo)}, ${Number(p.precioMenudeo)}, '${p.imagen}')">Añadir al carrito</button>
         `;
         contenedor.appendChild(div);
       });
