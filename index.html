@@ -183,13 +183,11 @@
 <script>
   let carrito = [];
 
-  // Alterna visibilidad carrito
   function toggleCarrito() {
     const carritoDiv = document.getElementById('carrito');
     carritoDiv.style.display = carritoDiv.style.display === 'block' ? 'none' : 'block';
   }
 
-  // Actualiza el carrito en pantalla
   function actualizarCarrito() {
     const lista = document.getElementById('listaProductos');
     lista.innerHTML = '';
@@ -197,8 +195,11 @@
     let totalGeneral = 0;
 
     carrito.forEach((item, index) => {
-      const precioUnitario = item.cantidad >= 3 ? item.precioMayoreo : item.precioMenudeo;
-      const subtotal = precioUnitario * item.cantidad;
+      const precioMayoreo = Number(item.precioMayoreo);
+      const precioMenudeo = Number(item.precioMenudeo);
+      const cantidad = Number(item.cantidad);
+      const precioUnitario = cantidad >= 3 ? precioMayoreo : precioMenudeo;
+      const subtotal = precioUnitario * cantidad;
       totalGeneral += subtotal;
 
       const li = document.createElement('li');
@@ -207,7 +208,7 @@
         <div>
           <strong>${item.nombre}</strong><br/>
           Precio unitario: $${precioUnitario.toFixed(2)} MXN<br/>
-          Cantidad: <input type="number" min="1" value="${item.cantidad}" onchange="cambiarCantidad(${index}, this.value)" />
+          Cantidad: <input type="number" min="1" value="${cantidad}" onchange="cambiarCantidad(${index}, this.value)" />
           <br/>
           Subtotal: $${subtotal.toFixed(2)} MXN
         </div>
@@ -220,7 +221,6 @@
     document.getElementById('totalGeneral').innerText = `Total: $${totalGeneral.toFixed(2)} MXN`;
   }
 
-  // Cambia cantidad producto en carrito
   function cambiarCantidad(index, nuevaCantidad) {
     const cantidad = parseInt(nuevaCantidad);
     if (cantidad > 0) {
@@ -229,13 +229,16 @@
     }
   }
 
-  // Elimina producto del carrito
   function eliminarProducto(index) {
     carrito.splice(index, 1);
     actualizarCarrito();
   }
 
-  // Agrega producto al carrito (o aumenta cantidad si ya existe)
+  // Función para escapar comillas simples y dobles en nombres de productos
+  function escaparTexto(texto) {
+    return texto.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+
   function agregarAlCarrito(nombre, precioMayoreo, precioMenudeo) {
     const index = carrito.findIndex(p => p.nombre === nombre);
     if (index !== -1) {
@@ -244,11 +247,9 @@
       carrito.push({ nombre, precioMayoreo, precioMenudeo, cantidad: 1 });
     }
     actualizarCarrito();
-    // Mostrar carrito automáticamente cuando se agrega producto
     document.getElementById('carrito').style.display = 'block';
   }
 
-  // Enviar pedido por WhatsApp, alternando números
   function enviarPedidoWhatsApp() {
     if (carrito.length === 0) {
       alert('Tu carrito está vacío.');
@@ -266,21 +267,22 @@
       return;
     }
 
-    let mensaje = `Hola, soy *${nombreCompleto}* y quiero realizar el siguiente pedido:\n\n`;
-    mensaje += `Domicilio: ${domicilio}\nCiudad: ${ciudad}\nCódigo Postal: ${codigoPostal}\nEstado: ${estado}\n\n`;
-    mensaje += "Productos:\n";
+    let mensaje = `Hola, soy *${nombreCompleto}* y quiero realizar el siguiente pedido:%0A%0A`;
+    mensaje += `Domicilio: ${domicilio}%0ACiudad: ${ciudad}%0ACódigo Postal: ${codigoPostal}%0AEstado: ${estado}%0A%0A`;
+    mensaje += "Productos:%0A";
 
     let totalGeneral = 0;
     carrito.forEach(item => {
-      const precioUnitario = item.cantidad >= 3 ? item.precioMayoreo : item.precioMenudeo;
-      const subtotal = precioUnitario * item.cantidad;
+      const precioMayoreo = Number(item.precioMayoreo);
+      const precioMenudeo = Number(item.precioMenudeo);
+      const cantidad = Number(item.cantidad);
+      const precioUnitario = cantidad >= 3 ? precioMayoreo : precioMenudeo;
+      const subtotal = precioUnitario * cantidad;
       totalGeneral += subtotal;
-      mensaje += `- ${item.nombre} x${item.cantidad} = $${subtotal.toFixed(2)} MXN\n`;
+      mensaje += `- ${item.nombre} x${cantidad} = $${subtotal.toFixed(2)} MXN%0A`;
     });
 
-    mensaje += `\n*Total: $${totalGeneral.toFixed(2)} MXN*`;
-
-    const mensajeCodificado = encodeURIComponent(mensaje);
+    mensaje += `%0A*Total: $${totalGeneral.toFixed(2)} MXN*`;
 
     const numerosWhatsApp = ['5213481098508', '5213481070708'];
 
@@ -288,15 +290,16 @@
     ultimoIndice = parseInt(ultimoIndice);
 
     const siguienteIndice = (ultimoIndice + 1) % numerosWhatsApp.length;
-
     localStorage.setItem('ultimoNumeroWhatsApp', siguienteIndice.toString());
 
     const numeroWhatsApp = numerosWhatsApp[ultimoIndice];
 
-    window.open(`https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`, '_blank');
+    const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensaje}`;
+
+    window.open(urlWhatsApp, '_blank');
   }
 
-  // Cargar productos desde JSON y mostrar catálogo
+  // Cargar productos y mostrar catálogo
   fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
     .then(res => res.json())
     .then(data => {
@@ -308,19 +311,24 @@
       data.forEach(p => {
         const div = document.createElement('div');
         div.className = 'producto';
+
+        // Escapar nombre para evitar errores en onclick
+        const nombreEscapado = p.nombre.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
         div.innerHTML = `
           <img src="${p.imagen}" alt="${p.nombre}" />
           <h3>${p.nombre}</h3>
-          <p>$${p.precioMayoreo.toFixed(2)} MXN (Mayoreo)</p>
-          <p>$${p.precioMenudeo.toFixed(2)} MXN (Menudeo)</p>
+          <p>$${Number(p.precioMayoreo).toFixed(2)} MXN (Mayoreo)</p>
+          <p>$${Number(p.precioMenudeo).toFixed(2)} MXN (Menudeo)</p>
           <p>${p.descripcion}</p>
-          <button class="boton" onclick="agregarAlCarrito('${p.nombre}', ${p.precioMayoreo}, ${p.precioMenudeo})">Añadir al carrito</button>
+          <button class="boton" onclick="agregarAlCarrito('${nombreEscapado}', ${Number(p.precioMayoreo)}, ${Number(p.precioMenudeo)})">Añadir al carrito</button>
         `;
         contenedor.appendChild(div);
       });
     })
     .catch(error => {
-      document.getElementById('catalogo').innerHTML = '<p style="text-align:center;color:red;">Error al cargar los productos.</p>';
+      const contenedor = document.getElementById('catalogo');
+      contenedor.innerHTML = '<p style="text-align:center;color:red;">Error al cargar los productos.</p>';
       console.error('Error al cargar productos.json:', error);
     });
 </script>
