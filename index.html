@@ -208,10 +208,9 @@
   <button id="btnEnviarWhatsApp">Enviar pedido por WhatsApp</button>
 </aside>
 <footer>&copy; 2025 Lunamar Bags. C&C.</footer>
-
 <script>
 let carrito = [];
-let whatsappToggle = true;
+let whatsappToggle = true; // Para alternar entre los dos números
 
 function toggleCarrito(event) {
   event.stopPropagation();
@@ -294,12 +293,12 @@ function eliminarProducto(index) {
   actualizarCarrito();
 }
 
+// Función para enviar pedido por WhatsApp alternando números
 document.getElementById('btnEnviarWhatsApp').addEventListener('click', () => {
   if (carrito.length === 0) {
     alert('El carrito está vacío.');
     return;
   }
-
   const nombreCompleto = document.getElementById('nombreCompleto').value.trim();
   const domicilio = document.getElementById('domicilio').value.trim();
   const ciudad = document.getElementById('ciudad').value.trim();
@@ -324,44 +323,43 @@ document.getElementById('btnEnviarWhatsApp').addEventListener('click', () => {
   });
 
   const mensaje = `Pedido Lunamar Bags:\n\n${productosTexto}\nTotal: $${totalGeneral.toFixed(2)} MXN\n\nDatos del cliente:\nNombre completo: ${nombreCompleto}\nDomicilio: ${domicilio}\nCiudad: ${ciudad}\nCódigo Postal: ${codigoPostal}\nEstado: ${estado}`;
+
   const numero = whatsappToggle ? '3481098508' : '3481070708';
   whatsappToggle = !whatsappToggle;
+
   const urlWhatsapp = `https://wa.me/52${numero}?text=${encodeURIComponent(mensaje)}`;
+
   window.open(urlWhatsapp, '_blank');
 });
 
-// Carga ejemplo de productos (en lugar del fetch externo)
-const productosEjemplo = [
-  {
-    nombre: "Bolsa Rosada Floral",
-    precioMayoreo: 120,
-    precioMenudeo: 160,
-    descripcion: "Bolsa de mano elegante con diseño floral.",
-    imagen: "https://via.placeholder.com/300x300.png?text=Bolsa"
-  },
-  {
-    nombre: "Tote Azul Cielo",
-    precioMayoreo: 100,
-    precioMenudeo: 140,
-    descripcion: "Tote bag espaciosa y resistente.",
-    imagen: "https://via.placeholder.com/300x300.png?text=Tote"
-  }
-];
-
-const contenedor = document.getElementById('catalogo');
-productosEjemplo.forEach(p => {
-  const div = document.createElement('div');
-  div.className = 'producto';
-  div.innerHTML = `
-    <img src="${p.imagen}" alt="${p.nombre}" />
-    <h3>${p.nombre}</h3>
-    <p>$${p.precioMayoreo.toFixed(2)} MXN (Mayoreo)</p>
-    <p>$${p.precioMenudeo.toFixed(2)} MXN (Menudeo)</p>
-    <p>${p.descripcion}</p>
-    <button class="boton" onclick="agregarAlCarrito('${p.nombre}', ${p.precioMayoreo}, ${p.precioMenudeo}, '${p.imagen}')">Añadir al carrito</button>
-  `;
-  contenedor.appendChild(div);
-});
+fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
+  .then(res => res.json())
+  .then(data => {
+    const contenedor = document.getElementById('catalogo');
+    if (!data || data.length === 0) {
+      contenedor.innerHTML = '<p style="text-align:center;">No hay productos disponibles en este momento.</p>';
+      return;
+    }
+    data.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'producto';
+      const nombreEscapado = p.nombre.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      div.innerHTML = `
+        <img src="${p.imagen}" alt="${p.nombre}" />
+        <h3>${p.nombre}</h3>
+        <p>$${Number(p.precioMayoreo).toFixed(2)} MXN (Mayoreo)</p>
+        <p>$${Number(p.precioMenudeo).toFixed(2)} MXN (Menudeo)</p>
+        <p>${p.descripcion}</p>
+        <button class="boton" onclick="agregarAlCarrito('${nombreEscapado}', ${Number(p.precioMayoreo)}, ${Number(p.precioMenudeo)}, '${p.imagen}')">Añadir al carrito</button>
+      `;
+      contenedor.appendChild(div);
+    });
+  })
+  .catch(error => {
+    const contenedor = document.getElementById('catalogo');
+    contenedor.innerHTML = '<p style="text-align:center;color:red;">Error al cargar los productos.</p>';
+    console.error('Error al cargar productos.json:', error);
+  });
 </script>
 </body>
 </html>
