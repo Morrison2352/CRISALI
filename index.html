@@ -210,27 +210,156 @@
 <footer>&copy; 2025 Lunamar Bags. C&C.</footer>
 <script>
 let carrito = [];
-let whatsappToggle = true;
+let whatsappToggle = true; // Para alternar entre los dos números
 
-function resetFormulario() {
-  carrito = [];
-  actualizarCarrito();
-  document.getElementById('nombreCompleto').value = '';
-  document.getElementById('domicilio').value = '';
-  document.getElementById('ciudad').value = '';
-  document.getElementById('codigoPostal').value = '';
-  document.getElementById('estado').value = '';
-  document.getElementById('carrito').style.display = 'none';
+function toggleCarrito(event) {
+  event.stopPropagation();
+  const carritoDiv = document.getElementById('carrito');
+  carritoDiv.style.display = carritoDiv.style.display === 'block' ? 'none' : 'block';
 }
 
-// Reemplaza este bloque en tu código existente
+document.addEventListener('click', function (e) {
+  const carritoDiv = document.getElementById('carrito');
+  const boton = document.getElementById('verCarritoBtn');
+  if (!carritoDiv.contains(e.target) && !boton.contains(e.target)) {
+    carritoDiv.style.display = 'none';
+  }
+});
 
-// ...
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') {
+    document.getElementById('carrito').style.display = 'none';
+  }
+});
 
-// En tu función document.getElementById('btnEnviarWhatsApp').addEventListener
+function agregarAlCarrito(nombre, precioMayoreo, precioMenudeo, imagen) {
+  const index = carrito.findIndex(p => p.nombre === nombre);
+  if (index !== -1) {
+    carrito[index].cantidad += 1;
+  } else {
+    carrito.push({ nombre, precioMayoreo, precioMenudeo, cantidad: 1, imagen });
+  }
+  actualizarCarrito();
+}
 
-// Justo antes o después de abrir WhatsApp, añade:
-// resetFormulario();
+function actualizarCarrito() {
+  const lista = document.getElementById('listaProductos');
+  lista.innerHTML = '';
+  let totalGeneral = 0;
+  let totalItems = 0;
+  const totalCantidad = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+  const usarMayoreo = totalCantidad >= 3;
+
+  carrito.forEach((item, index) => {
+    const precioUnitario = usarMayoreo ? item.precioMayoreo : item.precioMenudeo;
+    const subtotal = precioUnitario * item.cantidad;
+    totalGeneral += subtotal;
+    totalItems += item.cantidad;
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div>
+        <img src="${item.imagen}" alt="${item.nombre}" />
+        <div class="infoProducto">
+          <strong>${item.nombre}</strong><br/>
+          Precio unitario: $${precioUnitario.toFixed(2)} MXN<br/>
+          Cantidad: <input type="number" min="1" value="${item.cantidad}" onchange="cambiarCantidad(${index}, this.value)" /><br/>
+          Subtotal: $${subtotal.toFixed(2)} MXN
+        </div>
+      </div>
+      <button class="btn-eliminar" onclick="eliminarProducto(${index})">Eliminar</button>
+    `;
+    lista.appendChild(li);
+  });
+  document.getElementById('totalGeneral').innerText = `Total: $${totalGeneral.toFixed(2)} MXN`;
+  const cantidadSpan = document.getElementById('carritoCantidad');
+  if (totalItems > 0) {
+    cantidadSpan.style.display = 'inline-block';
+    cantidadSpan.textContent = totalItems;
+  } else {
+    cantidadSpan.style.display = 'none';
+  }
+}
+
+function cambiarCantidad(index, nuevaCantidad) {
+  const cantidad = parseInt(nuevaCantidad);
+  if (cantidad > 0) {
+    carrito[index].cantidad = cantidad;
+    actualizarCarrito();
+  }
+}
+
+function eliminarProducto(index) {
+  carrito.splice(index, 1);
+  actualizarCarrito();
+}
+
+// Función para enviar pedido por WhatsApp alternando números
+document.getElementById('btnEnviarWhatsApp').addEventListener('click', () => {
+  if (carrito.length === 0) {
+    alert('El carrito está vacío.');
+    return;
+  }
+  const nombreCompleto = document.getElementById('nombreCompleto').value.trim();
+  const domicilio = document.getElementById('domicilio').value.trim();
+  const ciudad = document.getElementById('ciudad').value.trim();
+  const codigoPostal = document.getElementById('codigoPostal').value.trim();
+  const estado = document.getElementById('estado').value.trim();
+
+  if (!nombreCompleto || !domicilio || !ciudad || !codigoPostal || !estado) {
+    alert('Por favor, complete todos los datos personales.');
+    return;
+  }
+
+  const totalCantidad = carrito.reduce((acc, item) => acc + item.cantidad, 0);
+  const usarMayoreo = totalCantidad >= 3;
+  let totalGeneral = 0;
+  let productosTexto = '';
+
+  carrito.forEach(item => {
+    const precioUnitario = usarMayoreo ? item.precioMayoreo : item.precioMenudeo;
+    const subtotal = precioUnitario * item.cantidad;
+    totalGeneral += subtotal;
+    productosTexto += `- ${item.nombre} (Cantidad: ${item.cantidad}, Precio unitario: $${precioUnitario.toFixed(2)} MXN, Subtotal: $${subtotal.toFixed(2)} MXN)\n`;
+  });
+
+  const mensaje = `Pedido Lunamar Bags:\n\n${productosTexto}\nTotal: $${totalGeneral.toFixed(2)} MXN\n\nDatos del cliente:\nNombre completo: ${nombreCompleto}\nDomicilio: ${domicilio}\nCiudad: ${ciudad}\nCódigo Postal: ${codigoPostal}\nEstado: ${estado}`;
+
+  const numero = whatsappToggle ? '3481098508' : '3481070708';
+  whatsappToggle = !whatsappToggle;
+
+  const urlWhatsapp = `https://wa.me/52${numero}?text=${encodeURIComponent(mensaje)}`;
+
+  window.open(urlWhatsapp, '_blank');
+});
+
+fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
+  .then(res => res.json())
+  .then(data => {
+    const contenedor = document.getElementById('catalogo');
+    if (!data || data.length === 0) {
+      contenedor.innerHTML = '<p style="text-align:center;">No hay productos disponibles en este momento.</p>';
+      return;
+    }
+    data.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'producto';
+      const nombreEscapado = p.nombre.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      div.innerHTML = `
+        <img src="${p.imagen}" alt="${p.nombre}" />
+        <h3>${p.nombre}</h3>
+        <p>$${Number(p.precioMayoreo).toFixed(2)} MXN (Mayoreo)</p>
+        <p>$${Number(p.precioMenudeo).toFixed(2)} MXN (Menudeo)</p>
+        <p>${p.descripcion}</p>
+        <button class="boton" onclick="agregarAlCarrito('${nombreEscapado}', ${Number(p.precioMayoreo)}, ${Number(p.precioMenudeo)}, '${p.imagen}')">Añadir al carrito</button>
+      `;
+      contenedor.appendChild(div);
+    });
+  })
+  .catch(error => {
+    const contenedor = document.getElementById('catalogo');
+    contenedor.innerHTML = '<p style="text-align:center;color:red;">Error al cargar los productos.</p>';
+    console.error('Error al cargar productos.json:', error);
+  });
 </script>
 </body>
 </html>
