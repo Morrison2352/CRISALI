@@ -147,6 +147,14 @@
 </head>
 <body>
 
+<header>
+  <img src="https://raw.githubusercontent.com/Morrison2352/lunamar-landing/refs/heads/main/LUNAMAR-BAGS.png" alt="Lunamar Bags Logo" class="logo" />
+  <h1>Lunamar Bags</h1>
+  <p>Catálogo de productos</p>
+</header>
+
+<section class="catalogo" id="catalogo"></section>
+
 <div id="modalCantidad" onclick="cerrarModalDesdeFondo(event)">
   <div id="modalContenido" onclick="event.stopPropagation()">
     <h3>¿Cuántas piezas deseas?</h3>
@@ -156,12 +164,41 @@
   </div>
 </div>
 
+<footer>&copy; 2025 Lunamar Bags. C&C.</footer>
+
 <script>
 function cerrarModalDesdeFondo(event) {
   if (event.target.id === 'modalCantidad') {
     document.getElementById('modalCantidad').style.display = 'none';
   }
 }
+
+fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
+  .then(res => res.json())
+  .then(data => {
+    const contenedor = document.getElementById('catalogo');
+    if (!data || data.length === 0) {
+      contenedor.innerHTML = '<p style="text-align:center;">No hay productos disponibles en este momento.</p>';
+      return;
+    }
+    data.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'producto';
+      div.innerHTML = `
+        <img src="${p.imagen}" alt="${p.nombre}" />
+        <h3>${p.nombre}</h3>
+        <p>$${p.precioMayoreo} MXN (Mayoreo)</p>
+        <p>$${p.precioMenudeo} MXN (Menudeo)</p>
+        <p>${p.descripcion}</p>
+        <button class="boton" onclick="mostrarModal('${p.nombre}', ${p.precioMayoreo}, ${p.precioMenudeo})">Añadir al carrito</button>
+      `;
+      contenedor.appendChild(div);
+    });
+  })
+  .catch(error => {
+    document.getElementById('catalogo').innerHTML = '<p style="text-align:center;color:red;">Error al cargar los productos.</p>';
+    console.error('Error al cargar productos.json:', error);
+  });
 </script>
 
 </body>
