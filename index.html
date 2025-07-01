@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lunamar Bags | Catálogo</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
@@ -11,12 +11,14 @@
     header, footer { background: #f0d7e7; text-align: center; padding: 20px; }
     header h1 { margin: 10px 0 0; color: #6a4e77; }
     .logo { max-width: 180px; margin-bottom: 10px; }
+
     .catalogo {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 20px;
       padding: 20px;
     }
+
     .producto {
       background: white;
       border-radius: 12px;
@@ -24,15 +26,18 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       text-align: center;
     }
+
     .producto img {
       max-width: 100%;
       border-radius: 8px;
       height: auto;
     }
+
     .producto h3 {
       color: #6a4e77;
       margin: 10px 0;
     }
+
     .boton {
       background: #6a4e77;
       color: white;
@@ -44,18 +49,18 @@
       cursor: pointer;
       border: none;
     }
+
     #modalCantidad {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: rgba(0,0,0,0.6);
       justify-content: center;
       align-items: center;
       z-index: 2000;
     }
+
     #modalContenido {
       background: white;
       padding: 20px;
@@ -64,12 +69,106 @@
       max-width: 300px;
       width: 90%;
     }
+
+    #carrito {
+      padding: 20px;
+      background: #fff3f6;
+      border-top: 2px solid #e0a5c0;
+      position: fixed;
+      top: 80px;
+      right: 0;
+      width: 100%;
+      max-width: 350px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1000;
+    }
+
+    #carrito h2 { color: #6a4e77; margin-top: 0; }
+    #carrito ul { list-style: none; padding: 0; margin: 0; }
+    #carrito li {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #carrito li > div { flex-grow: 1; }
+    input[type='number'], input[type='text'] {
+      width: 100%;
+      padding: 5px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .btn-eliminar {
+      background: #c0392b;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    #verCarritoBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #6a4e77;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      z-index: 1500;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    #btnEnviarWhatsapp {
+      background: #25d366;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      margin-top: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+    }
+
+    /* Formulario datos usuario */
+    #datosUsuario {
+      margin-top: 15px;
+      text-align: left;
+    }
+    #datosUsuario label {
+      font-weight: 600;
+      display: block;
+      margin-top: 10px;
+    }
+
     @media (max-width: 600px) {
-      .catalogo { padding: 10px; }
+      #carrito {
+        width: 100%;
+        left: 0;
+        top: auto;
+        bottom: 0;
+        max-height: 60vh;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+      }
+      .catalogo {
+        padding: 10px;
+      }
     }
   </style>
 </head>
 <body>
+
 <header>
   <img src="https://raw.githubusercontent.com/Morrison2352/lunamar-landing/refs/heads/main/LUNAMAR-BAGS.png" alt="Lunamar Bags Logo" class="logo" />
   <h1>Lunamar Bags</h1>
@@ -78,6 +177,7 @@
 
 <section class="catalogo" id="catalogo"></section>
 
+<!-- Modal para seleccionar cantidad -->
 <div id="modalCantidad" onclick="cerrarModalDesdeFondo(event)">
   <div id="modalContenido" onclick="event.stopPropagation()">
     <h3>¿Cuántas piezas deseas?</h3>
@@ -87,30 +187,144 @@
   </div>
 </div>
 
+<!-- Carrito lateral -->
+<div id="carrito">
+  <h2>Carrito de Compras</h2>
+  <ul id="listaCarrito"></ul>
+
+  <div id="datosUsuario">
+    <label for="nombreCompleto">Nombre Completo:</label>
+    <input type="text" id="nombreCompleto" placeholder="Tu nombre completo" />
+
+    <label for="domicilio">Domicilio:</label>
+    <input type="text" id="domicilio" placeholder="Tu domicilio" />
+
+    <label for="ciudad">Ciudad:</label>
+    <input type="text" id="ciudad" placeholder="Tu ciudad" />
+
+    <label for="codigoPostal">Código Postal:</label>
+    <input type="text" id="codigoPostal" placeholder="Código postal" />
+
+    <label for="estado">Estado:</label>
+    <input type="text" id="estado" placeholder="Estado" />
+  </div>
+
+  <button id="btnEnviarWhatsapp">Enviar pedido por WhatsApp</button>
+</div>
+
+<button id="verCarritoBtn" title="Ver carrito">🛒</button>
+
 <footer>&copy; 2025 Lunamar Bags. C&C.</footer>
 
 <script>
-  let productoTemporal = {};
+  let productoTemporal = null;
+  let carrito = [];
 
+  // Mostrar modal cantidad
+  function mostrarModal(nombre, precioMayoreo, precioMenudeo) {
+    productoTemporal = { nombre, precioMayoreo, precioMenudeo };
+    document.getElementById('cantidadSeleccionada').value = 1;
+    document.getElementById('modalCantidad').style.display = 'flex';
+  }
+
+  // Cerrar modal si clic fuera
   function cerrarModalDesdeFondo(event) {
     if (event.target.id === 'modalCantidad') {
       document.getElementById('modalCantidad').style.display = 'none';
     }
   }
 
-  function mostrarModal(nombre, precioMayoreo, precioMenudeo) {
-    productoTemporal = { nombre, precioMayoreo, precioMenudeo };
-    document.getElementById('cantidadSeleccionada').value = 1; // reset cantidad
-    document.getElementById('modalCantidad').style.display = 'flex';
-  }
-
+  // Confirmar cantidad y añadir al carrito
   function confirmarCantidad() {
-    const cantidad = document.getElementById('cantidadSeleccionada').value;
-    console.log("Producto confirmado:", productoTemporal, "Cantidad:", cantidad);
-    // Aquí puedes agregar la lógica para añadir al carrito o enviar por WhatsApp/mail
+    const cantidad = parseInt(document.getElementById('cantidadSeleccionada').value);
+    if (!cantidad || cantidad < 1) {
+      alert('Por favor, ingresa una cantidad válida.');
+      return;
+    }
+    // Buscar si producto ya está en carrito
+    const index = carrito.findIndex(item => item.nombre === productoTemporal.nombre);
+    if (index > -1) {
+      carrito[index].cantidad += cantidad;
+    } else {
+      carrito.push({ ...productoTemporal, cantidad });
+    }
+    actualizarCarrito();
     document.getElementById('modalCantidad').style.display = 'none';
   }
 
+  // Actualizar la vista del carrito
+  function actualizarCarrito() {
+    const lista = document.getElementById('listaCarrito');
+    lista.innerHTML = '';
+    if (carrito.length === 0) {
+      lista.innerHTML = '<li>No hay productos en el carrito.</li>';
+      return;
+    }
+    carrito.forEach((item, idx) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <div>
+          <strong>${item.nombre}</strong><br>
+          Precio Mayoreo: $${item.precioMayoreo} MXN<br>
+          Precio Menudeo: $${item.precioMenudeo} MXN<br>
+          Cantidad: ${item.cantidad}
+        </div>
+        <button class="btn-eliminar" onclick="eliminarProducto(${idx})">Eliminar</button>
+      `;
+      lista.appendChild(li);
+    });
+  }
+
+  // Eliminar producto del carrito
+  function eliminarProducto(index) {
+    carrito.splice(index, 1);
+    actualizarCarrito();
+  }
+
+  // Mostrar/ocultar carrito
+  const btnVerCarrito = document.getElementById('verCarritoBtn');
+  const carritoDiv = document.getElementById('carrito');
+  btnVerCarrito.addEventListener('click', () => {
+    if (carritoDiv.style.display === 'block') {
+      carritoDiv.style.display = 'none';
+    } else {
+      carritoDiv.style.display = 'block';
+    }
+  });
+
+  // Enviar pedido por WhatsApp
+  document.getElementById('btnEnviarWhatsapp').addEventListener('click', () => {
+    if (carrito.length === 0) {
+      alert('El carrito está vacío.');
+      return;
+    }
+    // Obtener datos del usuario
+    const nombreCompleto = document.getElementById('nombreCompleto').value.trim();
+    const domicilio = document.getElementById('domicilio').value.trim();
+    const ciudad = document.getElementById('ciudad').value.trim();
+    const codigoPostal = document.getElementById('codigoPostal').value.trim();
+    const estado = document.getElementById('estado').value.trim();
+
+    if (!nombreCompleto || !domicilio || !ciudad || !codigoPostal || !estado) {
+      alert('Por favor, completa todos los datos personales.');
+      return;
+    }
+
+    // Construir mensaje
+    let mensaje = `Hola, soy ${nombreCompleto} y quiero realizar el siguiente pedido:%0A`;
+    mensaje += `Domicilio: ${domicilio}, ${ciudad}, ${estado}, C.P. ${codigoPostal}%0A%0A`;
+    carrito.forEach(item => {
+      mensaje += `- ${item.nombre} x${item.cantidad} piezas (Mayoreo $${item.precioMayoreo} / Menudeo $${item.precioMenudeo})%0A`;
+    });
+
+    // Teléfono al que se enviará el WhatsApp (cambia al número real)
+    const telefono = '5211234567890'; // Ejemplo: México +52 y número sin espacios
+
+    const urlWhatsapp = `https://wa.me/${telefono}?text=${mensaje}`;
+    window.open(urlWhatsapp, '_blank');
+  });
+
+  // Cargar productos y mostrar catálogo
   fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
     .then(res => res.json())
     .then(data => {
