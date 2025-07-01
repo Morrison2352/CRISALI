@@ -166,8 +166,8 @@
 
       if (Object.keys(carrito).length === 0) return alert("El carrito está vacío.");
       const numero = Math.random() < 0.5 ? '3481098508' : '3481070708';
-      let mensaje = `Hola, soy ${nombre} y quiero realizar el siguiente pedido:%0A`;
-      mensaje += `Domicilio: ${domicilio}, ${ciudad}, ${estado}, CP: ${cp}%0A`;
+      let mensaje = `Hola, soy ${nombre} y quiero realizar el siguiente pedido:\n`;
+      mensaje += `Domicilio: ${domicilio}, ${ciudad}, ${estado}, CP: ${cp}\n`;
       let total = 0;
       const cantidadTotal = calcularTotalUnidades();
       const usarMayoreo = cantidadTotal >= 3;
@@ -175,11 +175,11 @@
       for (const nombre in carrito) {
         const item = carrito[nombre];
         const precioUnitario = usarMayoreo ? item.precioMayoreo : item.precioMenudeo;
-        mensaje += `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}%0A`;
+        mensaje += `- ${nombre}: ${item.cantidad} piezas x $${precioUnitario.toFixed(2)} = $${(item.cantidad * precioUnitario).toFixed(2)}\n`;
         total += precioUnitario * item.cantidad;
       }
-      mensaje += `%0ATotal: $${total.toFixed(2)} MXN`;
-      window.open(`https://wa.me/52${numero}?text=${mensaje}`, '_blank');
+      mensaje += `\nTotal: $${total.toFixed(2)} MXN`;
+      window.open(`https://wa.me/52${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
       carrito = {};
       renderCarrito();
     }
