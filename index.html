@@ -210,7 +210,7 @@
 <footer>&copy; 2025 Lunamar Bags. C&C.</footer>
 <script>
 let carrito = [];
-let whatsappToggle = true; // Para alternar entre los dos números
+let whatsappToggle = true;
 
 function toggleCarrito(event) {
   event.stopPropagation();
@@ -293,7 +293,6 @@ function eliminarProducto(index) {
   actualizarCarrito();
 }
 
-// Función para enviar pedido por WhatsApp alternando números
 document.getElementById('btnEnviarWhatsApp').addEventListener('click', () => {
   if (carrito.length === 0) {
     alert('El carrito está vacío.');
@@ -326,10 +325,19 @@ document.getElementById('btnEnviarWhatsApp').addEventListener('click', () => {
 
   const numero = whatsappToggle ? '3481098508' : '3481070708';
   whatsappToggle = !whatsappToggle;
-
   const urlWhatsapp = `https://wa.me/52${numero}?text=${encodeURIComponent(mensaje)}`;
-
   window.open(urlWhatsapp, '_blank');
+
+  carrito = [];
+  actualizarCarrito();
+  document.getElementById('nombreCompleto').value = '';
+  document.getElementById('domicilio').value = '';
+  document.getElementById('ciudad').value = '';
+  document.getElementById('codigoPostal').value = '';
+  document.getElementById('estado').value = '';
+  document.getElementById('carrito').style.display = 'none';
+
+  alert('¡Pedido enviado con éxito!');
 });
 
 fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
