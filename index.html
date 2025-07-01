@@ -7,25 +7,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: #fdf6f9;
-      margin: 0; padding: 0;
-      color: #333;
-    }
-    header, footer {
-      background: #f0d7e7;
-      text-align: center;
-      padding: 20px;
-    }
-    header h1 {
-      margin: 10px 0 0;
-      color: #6a4e77;
-    }
-    .logo {
-      max-width: 180px;
-      margin-bottom: 10px;
-    }
+    body { font-family: 'Poppins', sans-serif; background: #fdf6f9; margin: 0; padding: 0; color: #333; }
+    header, footer { background: #f0d7e7; text-align: center; padding: 20px; }
+    header h1 { margin: 10px 0 0; color: #6a4e77; }
+    .logo { max-width: 180px; margin-bottom: 10px; }
     .catalogo {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -67,23 +52,15 @@
       top: 80px;
       right: 0;
       width: 100%;
-      max-width: 400px;
+      max-width: 380px;
       max-height: 80vh;
       overflow-y: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
       display: none;
       z-index: 1000;
-      border-radius: 0 0 0 12px;
     }
-    #carrito h2 {
-      color: #6a4e77;
-      margin-top: 0;
-    }
-    #carrito ul {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 15px 0;
-    }
+    #carrito h2 { color: #6a4e77; margin-top: 0; }
+    #carrito ul { list-style: none; padding: 0; margin: 0; }
     #carrito li {
       margin-bottom: 10px;
       display: flex;
@@ -91,15 +68,13 @@
       justify-content: space-between;
       gap: 10px;
     }
-    #carrito li > div {
-      flex-grow: 1;
-    }
+    #carrito li > div { flex-grow: 1; }
     input[type='number'], input[type='text'] {
       width: 100%;
       padding: 5px;
       margin: 5px 0;
+      border-radius: 4px;
       border: 1px solid #ccc;
-      border-radius: 6px;
     }
     .btn-eliminar {
       background: #c0392b;
@@ -121,47 +96,40 @@
       cursor: pointer;
       z-index: 1500;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    #modalCantidad {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-    #modalContenido {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      max-width: 300px;
-      width: 90%;
-    }
-    #formDatos {
-      background: #fff3f6;
-      padding: 15px;
-      border-radius: 12px;
-      margin-top: 15px;
-    }
-    #formDatos label {
       font-weight: 600;
-      color: #6a4e77;
-      display: block;
-      margin-top: 10px;
+      font-size: 16px;
     }
-    #enviarPedido {
-      background: #6a4e77;
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      width: 100%;
-      font-size: 1rem;
+    #datosCliente {
+      margin-top: 20px;
+    }
+    #datosCliente label {
+      display: block;
+      font-weight: 600;
+      margin-top: 10px;
+      color: #6a4e77;
+    }
+    #datosCliente input {
+      margin-top: 5px;
+    }
+    #totalGeneral {
       margin-top: 15px;
+      font-weight: 700;
+      font-size: 1.1em;
+      color: #6a4e77;
+      text-align: right;
+    }
+    #btnEnviarWhatsApp {
+      margin-top: 20px;
+      width: 100%;
+      background: #25D366;
+      border: none;
+      color: white;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 3px 7px rgba(0,0,0,0.15);
     }
     @media (max-width: 600px) {
       #carrito {
@@ -180,7 +148,6 @@
   </style>
 </head>
 <body>
-
 <header>
   <img src="https://raw.githubusercontent.com/Morrison2352/lunamar-landing/refs/heads/main/LUNAMAR-BAGS.png" alt="Lunamar Bags Logo" class="logo" />
   <h1>Lunamar Bags</h1>
@@ -189,122 +156,102 @@
 
 <section class="catalogo" id="catalogo"></section>
 
-<button id="verCarritoBtn" onclick="toggleCarrito()">Ver carrito 🛒</button>
+<button id="verCarritoBtn" onclick="toggleCarrito()">Ver carrito</button>
 
-<section id="carrito">
+<aside id="carrito">
   <h2>Tu carrito</h2>
   <ul id="listaProductos"></ul>
 
-  <div id="formDatos">
-    <h3>Datos para el pedido</h3>
-    <label for="nombreCompleto">Nombre Completo</label>
-    <input type="text" id="nombreCompleto" placeholder="Tu nombre completo" required />
-
-    <label for="domicilio">Domicilio</label>
-    <input type="text" id="domicilio" placeholder="Tu domicilio" required />
-
-    <label for="ciudad">Ciudad</label>
-    <input type="text" id="ciudad" placeholder="Ciudad" required />
-
-    <label for="codigoPostal">Código Postal</label>
-    <input type="text" id="codigoPostal" placeholder="Código Postal" required />
-
-    <label for="estado">Estado</label>
-    <input type="text" id="estado" placeholder="Estado" required />
-
-    <button id="enviarPedido" onclick="enviarPedidoWhatsApp()">Enviar pedido por WhatsApp</button>
+  <div id="datosCliente">
+    <label for="nombreCompleto">Nombre Completo:</label>
+    <input type="text" id="nombreCompleto" placeholder="Tu nombre completo" />
+    <label for="domicilio">Domicilio:</label>
+    <input type="text" id="domicilio" placeholder="Calle, número, etc." />
+    <label for="ciudad">Ciudad:</label>
+    <input type="text" id="ciudad" placeholder="Ciudad" />
+    <label for="codigoPostal">Código Postal:</label>
+    <input type="text" id="codigoPostal" placeholder="Código postal" />
+    <label for="estado">Estado:</label>
+    <input type="text" id="estado" placeholder="Estado" />
   </div>
-</section>
 
-<!-- Modal para seleccionar cantidad -->
-<div id="modalCantidad" onclick="cerrarModalDesdeFondo(event)">
-  <div id="modalContenido" onclick="event.stopPropagation()">
-    <h3>¿Cuántas piezas deseas?</h3>
-    <input type="number" id="cantidadSeleccionada" min="1" value="1" />
-    <br><br>
-    <button class="boton" onclick="confirmarCantidad()">Aceptar</button>
-  </div>
-</div>
+  <div id="totalGeneral">Total: $0.00 MXN</div>
+
+  <button id="btnEnviarWhatsApp" onclick="enviarPedidoWhatsApp()">Enviar pedido por WhatsApp</button>
+</aside>
 
 <script>
-  let productoTemporal = null;
   let carrito = [];
 
-  const catalogoEl = document.getElementById('catalogo');
-  const carritoEl = document.getElementById('carrito');
-  const listaProductosEl = document.getElementById('listaProductos');
-
+  // Alterna visibilidad carrito
   function toggleCarrito() {
-    carritoEl.style.display = carritoEl.style.display === 'block' ? 'none' : 'block';
+    const carritoDiv = document.getElementById('carrito');
+    carritoDiv.style.display = carritoDiv.style.display === 'block' ? 'none' : 'block';
   }
 
-  function cerrarModalDesdeFondo(event) {
-    if(event.target.id === 'modalCantidad') {
-      document.getElementById('modalCantidad').style.display = 'none';
-    }
-  }
+  // Actualiza el carrito en pantalla
+  function actualizarCarrito() {
+    const lista = document.getElementById('listaProductos');
+    lista.innerHTML = '';
 
-  function mostrarModal(nombre, precioMayoreo, precioMenudeo) {
-    productoTemporal = { nombre, precioMayoreo, precioMenudeo };
-    document.getElementById('cantidadSeleccionada').value = 1;
-    document.getElementById('modalCantidad').style.display = 'flex';
-  }
+    let totalGeneral = 0;
 
-  function confirmarCantidad() {
-    const cantidad = parseInt(document.getElementById('cantidadSeleccionada').value);
-    if(isNaN(cantidad) || cantidad < 1) {
-      alert("Por favor, ingresa una cantidad válida.");
-      return;
-    }
-    agregarAlCarrito(productoTemporal, cantidad);
-    document.getElementById('modalCantidad').style.display = 'none';
-  }
+    carrito.forEach((item, index) => {
+      const precioUnitario = item.cantidad >= 3 ? item.precioMayoreo : item.precioMenudeo;
+      const subtotal = precioUnitario * item.cantidad;
+      totalGeneral += subtotal;
 
-  function agregarAlCarrito(producto, cantidad) {
-    const index = carrito.findIndex(p => p.nombre === producto.nombre);
-    if(index !== -1) {
-      carrito[index].cantidad += cantidad;
-    } else {
-      carrito.push({...producto, cantidad});
-    }
-    actualizarCarritoUI();
-    carritoEl.style.display = 'block'; // Mostrar carrito automáticamente
-  }
-
-  function actualizarCarritoUI() {
-    listaProductosEl.innerHTML = '';
-    if(carrito.length === 0) {
-      listaProductosEl.innerHTML = '<li>Tu carrito está vacío.</li>';
-      return;
-    }
-    carrito.forEach((producto, i) => {
       const li = document.createElement('li');
+
       li.innerHTML = `
         <div>
-          <strong>${producto.nombre}</strong><br />
-          Cantidad: <input type="number" min="1" value="${producto.cantidad}" onchange="cambiarCantidad(${i}, this.value)" />
+          <strong>${item.nombre}</strong><br/>
+          Precio unitario: $${precioUnitario.toFixed(2)} MXN<br/>
+          Cantidad: <input type="number" min="1" value="${item.cantidad}" onchange="cambiarCantidad(${index}, this.value)" />
+          <br/>
+          Subtotal: $${subtotal.toFixed(2)} MXN
         </div>
-        <button class="btn-eliminar" onclick="eliminarProducto(${i})">Eliminar</button>
+        <button class="btn-eliminar" onclick="eliminarProducto(${index})">Eliminar</button>
       `;
-      listaProductosEl.appendChild(li);
+
+      lista.appendChild(li);
     });
+
+    document.getElementById('totalGeneral').innerText = `Total: $${totalGeneral.toFixed(2)} MXN`;
   }
 
-  function cambiarCantidad(index, cantidad) {
-    const cant = parseInt(cantidad);
-    if(isNaN(cant) || cant < 1) return;
-    carrito[index].cantidad = cant;
-    actualizarCarritoUI();
+  // Cambia cantidad producto en carrito
+  function cambiarCantidad(index, nuevaCantidad) {
+    const cantidad = parseInt(nuevaCantidad);
+    if (cantidad > 0) {
+      carrito[index].cantidad = cantidad;
+      actualizarCarrito();
+    }
   }
 
+  // Elimina producto del carrito
   function eliminarProducto(index) {
     carrito.splice(index, 1);
-    actualizarCarritoUI();
+    actualizarCarrito();
   }
 
+  // Agrega producto al carrito (o aumenta cantidad si ya existe)
+  function agregarAlCarrito(nombre, precioMayoreo, precioMenudeo) {
+    const index = carrito.findIndex(p => p.nombre === nombre);
+    if (index !== -1) {
+      carrito[index].cantidad += 1;
+    } else {
+      carrito.push({ nombre, precioMayoreo, precioMenudeo, cantidad: 1 });
+    }
+    actualizarCarrito();
+    // Mostrar carrito automáticamente cuando se agrega producto
+    document.getElementById('carrito').style.display = 'block';
+  }
+
+  // Enviar pedido por WhatsApp, alternando números
   function enviarPedidoWhatsApp() {
-    if(carrito.length === 0) {
-      alert("Tu carrito está vacío.");
+    if (carrito.length === 0) {
+      alert('Tu carrito está vacío.');
       return;
     }
 
@@ -314,8 +261,8 @@
     const codigoPostal = document.getElementById('codigoPostal').value.trim();
     const estado = document.getElementById('estado').value.trim();
 
-    if(!nombreCompleto || !domicilio || !ciudad || !codigoPostal || !estado) {
-      alert("Por favor, completa todos los datos para el pedido.");
+    if (!nombreCompleto || !domicilio || !ciudad || !codigoPostal || !estado) {
+      alert('Por favor, completa todos los datos para el pedido.');
       return;
     }
 
@@ -323,22 +270,39 @@
     mensaje += `Domicilio: ${domicilio}\nCiudad: ${ciudad}\nCódigo Postal: ${codigoPostal}\nEstado: ${estado}\n\n`;
     mensaje += "Productos:\n";
 
+    let totalGeneral = 0;
     carrito.forEach(item => {
-      mensaje += `- ${item.nombre} x${item.cantidad}\n`;
+      const precioUnitario = item.cantidad >= 3 ? item.precioMayoreo : item.precioMenudeo;
+      const subtotal = precioUnitario * item.cantidad;
+      totalGeneral += subtotal;
+      mensaje += `- ${item.nombre} x${item.cantidad} = $${subtotal.toFixed(2)} MXN\n`;
     });
 
+    mensaje += `\n*Total: $${totalGeneral.toFixed(2)} MXN*`;
+
     const mensajeCodificado = encodeURIComponent(mensaje);
-    const numeroWhatsApp = '5212345678901'; // Cambia este número
+
+    const numerosWhatsApp = ['5213481098508', '5213481070708'];
+
+    let ultimoIndice = localStorage.getItem('ultimoNumeroWhatsApp') || '0';
+    ultimoIndice = parseInt(ultimoIndice);
+
+    const siguienteIndice = (ultimoIndice + 1) % numerosWhatsApp.length;
+
+    localStorage.setItem('ultimoNumeroWhatsApp', siguienteIndice.toString());
+
+    const numeroWhatsApp = numerosWhatsApp[ultimoIndice];
 
     window.open(`https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`, '_blank');
   }
 
-  // Cargar productos JSON y renderizar catálogo
+  // Cargar productos desde JSON y mostrar catálogo
   fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
     .then(res => res.json())
     .then(data => {
-      if(!data || data.length === 0) {
-        catalogoEl.innerHTML = '<p style="text-align:center;">No hay productos disponibles.</p>';
+      const contenedor = document.getElementById('catalogo');
+      if (!data || data.length === 0) {
+        contenedor.innerHTML = '<p style="text-align:center;">No hay productos disponibles en este momento.</p>';
         return;
       }
       data.forEach(p => {
@@ -347,23 +311,19 @@
         div.innerHTML = `
           <img src="${p.imagen}" alt="${p.nombre}" />
           <h3>${p.nombre}</h3>
-          <p><strong>Mayoreo:</strong> $${p.precioMayoreo} MXN</p>
-          <p><strong>Menudeo:</strong> $${p.precioMenudeo} MXN</p>
+          <p>$${p.precioMayoreo.toFixed(2)} MXN (Mayoreo)</p>
+          <p>$${p.precioMenudeo.toFixed(2)} MXN (Menudeo)</p>
           <p>${p.descripcion}</p>
-          <button class="boton" onclick="mostrarModal('${p.nombre}', ${p.precioMayoreo}, ${p.precioMenudeo})">Añadir al carrito</button>
+          <button class="boton" onclick="agregarAlCarrito('${p.nombre}', ${p.precioMayoreo}, ${p.precioMenudeo})">Añadir al carrito</button>
         `;
-        catalogoEl.appendChild(div);
+        contenedor.appendChild(div);
       });
     })
     .catch(error => {
-      catalogoEl.innerHTML = '<p style="text-align:center; color:red;">Error al cargar productos.</p>';
-      console.error(error);
+      document.getElementById('catalogo').innerHTML = '<p style="text-align:center;color:red;">Error al cargar los productos.</p>';
+      console.error('Error al cargar productos.json:', error);
     });
-
-  actualizarCarritoUI();
 </script>
-
 <footer>&copy; 2025 Lunamar Bags. C&C.</footer>
-
 </body>
 </html>
