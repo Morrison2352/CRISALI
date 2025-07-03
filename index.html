@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lunamar Bags | Catálogo</title>
+  <title>CRISALI | Catálogo</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; }
@@ -180,8 +180,8 @@
 </head>
 <body>
 <header>
-  <img src="https://raw.githubusercontent.com/Morrison2352/lunamar-landing/refs/heads/main/LUNAMAR-BAGS.png" alt="Lunamar Bags Logo" class="logo" />
-  <h1>Lunamar Bags</h1>
+  <img src="https://raw.githubusercontent.com/Morrison2352/CRISALI/refs/heads/main/BLANCO.png" alt="CRISALI Logo" class="logo" />
+  <h1>CRISALI</h1>
   <p>Catálogo de productos</p>
 </header>
 <section class="catalogo" id="catalogo"></section>
@@ -207,7 +207,7 @@
   <div id="totalGeneral">Total: $0.00 MXN</div>
   <button id="btnEnviarWhatsApp">Enviar pedido por WhatsApp</button>
 </aside>
-<footer>&copy; 2025 Lunamar Bags. C&C.</footer>
+<footer>&copy; 2025 CRISALI. C&C.</footer>
 <script>
 let carrito = [];
 let whatsappToggle = true;
@@ -321,7 +321,7 @@ document.getElementById('btnEnviarWhatsApp').addEventListener('click', () => {
     productosTexto += `- ${item.nombre} (Cantidad: ${item.cantidad}, Precio unitario: $${precioUnitario.toFixed(2)} MXN, Subtotal: $${subtotal.toFixed(2)} MXN)\n`;
   });
 
-  const mensaje = `Pedido Lunamar Bags:\n\n${productosTexto}\nTotal: $${totalGeneral.toFixed(2)} MXN\n\nDatos del cliente:\nNombre completo: ${nombreCompleto}\nDomicilio: ${domicilio}\nCiudad: ${ciudad}\nCódigo Postal: ${codigoPostal}\nEstado: ${estado}`;
+  const mensaje = `Pedido CRISALI:\n\n${productosTexto}\nTotal: $${totalGeneral.toFixed(2)} MXN\n\nDatos del cliente:\nNombre completo: ${nombreCompleto}\nDomicilio: ${domicilio}\nCiudad: ${ciudad}\nCódigo Postal: ${codigoPostal}\nEstado: ${estado}`;
 
   const numero = whatsappToggle ? '3481098508' : '3481070708';
   whatsappToggle = !whatsappToggle;
@@ -340,7 +340,7 @@ document.getElementById('btnEnviarWhatsApp').addEventListener('click', () => {
   alert('¡Pedido enviado con éxito!');
 });
 
-fetch('https://morrison2352.github.io/lunamar-landing/productos.json')
+fetch('https://morrison2352.github.io/CRISALI/productos.json')
   .then(res => res.json())
   .then(data => {
     const contenedor = document.getElementById('catalogo');
