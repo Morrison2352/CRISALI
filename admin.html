@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Panel de Administración - Lunamar Bags</title>
+  <title>Panel de Administración - CRISALI</title>
   <style>
     body { font-family: Arial, sans-serif; background: #fffbe7; margin: 0; padding: 20px; }
     #login, #adminPanel { max-width: 700px; margin: auto; }
@@ -23,7 +23,7 @@
 <body>
 
 <div id="login">
-  <h1>Panel de Administración - Lunamar Bags</h1>
+  <h1>Panel de Administración - CRISALI</h1>
   <label for="passwordInput">Contraseña:</label>
   <input type="password" id="passwordInput" placeholder="Ingresa la contraseña" />
   <button id="loginBtn">Entrar</button>
@@ -66,7 +66,7 @@
 
 <script>
 (function(){
-  const PASSWORD = "lunamar2025";
+  const PASSWORD = "CRISALI2025";
   const loginDiv = document.getElementById('login');
   const adminDiv = document.getElementById('adminPanel');
   const loginBtn = document.getElementById('loginBtn');
@@ -199,7 +199,7 @@
   }
 
   function cargarProductos() {
-    fetch("https://morrison2352.github.io/lunamar-landing/productos.json")
+    fetch("https://morrison2352.github.io/CRISALI/productos.json")
       .then(res => res.json())
       .then(data => {
         productos = data;
