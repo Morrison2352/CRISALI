@@ -5,18 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CRISALI | Acero Inoxidable</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
-  <style>
+    <style>
     * { box-sizing: border-box; }
     body { font-family: 'Poppins', sans-serif; background: #fdf6f9; margin: 0; padding: 0; color: #333; }
-    header, footer { background: #f0d7e7; text-align: center; padding: 0px; }
-    header h1 { margin: -70px 0 0; color: #6a4e77; }
-    .logo { max-width: 580px; margin-bottom: -70px; }
+
+    header, footer {
+      background: #f0d7e7;
+      text-align: center;
+      padding: 10px 20px;
+    }
+
+    header h1 {
+      margin: 0;
+      color: #6a4e77;
+      font-size: 2rem;
+    }
+
+    .logo {
+      max-width: 300px;
+      margin: 0 auto -40px;
+      display: block;
+    }
+
     .catalogo {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 20px;
       padding: 20px;
     }
+
     .producto {
       background: white;
       border-radius: 12px;
@@ -24,15 +41,18 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       text-align: center;
     }
+
     .producto img {
       max-width: 100%;
       border-radius: 8px;
       height: auto;
     }
+
     .producto h3 {
       color: #6a4e77;
       margin: 10px 0;
     }
+
     .boton {
       background: #6a4e77;
       color: white;
@@ -44,6 +64,7 @@
       cursor: pointer;
       border: none;
     }
+
     #carrito {
       padding: 20px;
       background: #fff3f6;
@@ -59,8 +80,10 @@
       display: none;
       z-index: 1000;
     }
+
     #carrito h2 { color: #6a4e77; margin-top: 0; }
     #carrito ul { list-style: none; padding: 0; margin: 0; }
+
     #carrito li {
       margin-bottom: 15px;
       display: flex;
@@ -70,12 +93,15 @@
       border-bottom: 1px solid #e0a5c0;
       padding-bottom: 10px;
     }
+
     #carrito li > div {
       flex-grow: 1;
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
+
     #carrito li img {
       width: 60px;
       height: 60px;
@@ -84,10 +110,14 @@
       flex-shrink: 0;
       box-shadow: 0 0 5px rgba(106, 78, 119, 0.3);
     }
+
     #carrito li div.infoProducto {
       flex-direction: column;
       text-align: left;
+      display: flex;
+      flex: 1 1 auto;
     }
+
     input[type='number'], input[type='text'] {
       width: 100%;
       padding: 5px;
@@ -95,6 +125,7 @@
       border-radius: 4px;
       border: 1px solid #ccc;
     }
+
     .btn-eliminar {
       background: #c0392b;
       color: white;
@@ -104,6 +135,7 @@
       cursor: pointer;
       height: fit-content;
     }
+
     #verCarritoBtn {
       position: fixed;
       bottom: 20px;
@@ -119,6 +151,7 @@
       font-weight: 600;
       font-size: 16px;
     }
+
     #carritoCantidad {
       position: absolute;
       top: -8px;
@@ -130,18 +163,22 @@
       padding: 4px 8px;
       border-radius: 50%;
     }
+
     #datosCliente {
       margin-top: 20px;
     }
+
     #datosCliente label {
       display: block;
       font-weight: 600;
       margin-top: 10px;
       color: #6a4e77;
     }
+
     #datosCliente input {
       margin-top: 5px;
     }
+
     #totalGeneral {
       margin-top: 15px;
       font-weight: 700;
@@ -149,6 +186,7 @@
       color: #6a4e77;
       text-align: right;
     }
+
     #btnEnviarWhatsApp {
       margin-top: 20px;
       width: 100%;
@@ -162,18 +200,41 @@
       font-weight: 600;
       box-shadow: 0 3px 7px rgba(0,0,0,0.15);
     }
-    @media (max-width: 600px) {
+
+    @media (max-width: 768px) {
+      header h1 { font-size: 1.8rem; }
+      .logo { max-width: 220px; margin-bottom: -20px; }
+
+      .catalogo {
+        padding: 10px;
+        gap: 15px;
+      }
+
+      .producto {
+        padding: 15px;
+      }
+
       #carrito {
         width: 100%;
         left: 0;
+        right: 0;
         top: auto;
         bottom: 0;
-        max-height: 60vh;
+        max-height: 70vh;
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
       }
-      .catalogo {
-        padding: 10px;
+
+      #verCarritoBtn {
+        right: 10px;
+        bottom: 10px;
+        padding: 10px 16px;
+        font-size: 14px;
+      }
+
+      #carritoCantidad {
+        font-size: 12px;
+        padding: 3px 6px;
       }
     }
   </style>
