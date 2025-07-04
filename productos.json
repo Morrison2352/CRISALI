@@ -12,5 +12,26 @@
     "precioMenudeo": 150,
     "descripcion": "MEJORES MARCAS",
     "imagen": "https://image.made-in-china.com/155f0j00QqGlAuVEYwcz/Fashion-Jewelry-Accessories-Stainless-Steel-Satellite-Necklace-Curb-Chain-Choker-Necklace-with-Beads-for-Lady-Jewelry.webp"
+  },
+  {
+    "nombre": "COLLAR XX3",
+    "precioMayoreo": 125,
+    "precioMenudeo": 175,
+    "descripcion": "COLLAR ELEGANTE",
+    "imagen": "https://image.made-in-china.com/155f0j00osbQzlncZVYC/Fashion-Accessories-Stainless-Steel-Necklace-Double-Beads-Cross-Link-Chain-jewelry-for-Lady.webp"
+  },
+  {
+    "nombre": "ANILLO FLOR",
+    "precioMayoreo": 60,
+    "precioMenudeo": 120,
+    "descripcion": "ANILLO PARA CUALQUIER OCASIÓN",
+    "imagen": "https://sunsetblink.com/cdn/shop/files/31.png?v=1707773735&width=1206"
+  },
+  {
+    "nombre": "Anillo Cabeza de Víbora",
+    "precioMayoreo": 150,
+    "precioMenudeo": 300,
+    "descripcion": "Especial para toda ocasión",
+    "imagen": "https://sunsetblink.com/cdn/shop/files/14_80e56862-9bf8-4551-b14b-355ba134b977.png?v=1707949884&width=1206"
   }
 ]
